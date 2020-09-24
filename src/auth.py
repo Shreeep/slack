@@ -2,7 +2,9 @@
 #global variable to store the user data
 data = {
     
-    'users': [] ,
+    'users': {
+
+    },
 
 }
 
@@ -30,6 +32,8 @@ def auth_logout(token):
     }
 
 def auth_register(email, password, name_first, name_last):
+    global userId
+    global tokenId
 
     newUser = {
         'name_first': name_first,
@@ -38,18 +42,35 @@ def auth_register(email, password, name_first, name_last):
         'password': password,
     }
 
+    #Generating user handle and limiting to 20 chars
+    handle = name_first.lower() + name_last.lower()
+    handle = handle[:20]
+
     #adding the registered user to global dict
-    data['users'].append(newUser)
+    #along with the user handle
+    data['users'][userId] = { 'handle' : handle}
+    
+    
 
-    #adding handle
 
-
-    return {
+    ret =  {
         'u_id': userId,
         'token': tokenId,
     }
 
+    userId += 1
+    tokenId += 1
+
+    return ret
+
 # quick tests to see if it works
-def test_login():
-    auth_register('test@email.com', 'password')
-    assert auth_login('test@email.com', 'yes') == True
+# def test_login():
+#     auth_register('test@email.com', 'password')
+#     assert auth_login('test@email.com', 'yes') == True
+
+
+auth_register('test@email.com', 'password', 'Wilson', 'Guo')
+print(data)
+print()
+auth_register('test@email.com', 'password', 'anamethatismorethantwentychars', 'Lasdfas')
+print(data)
