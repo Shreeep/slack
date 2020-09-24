@@ -20,8 +20,6 @@ def auth_login(email, password):
     global userId
     global tokenId
 
-    #Doesnt work yet
-
     # Checking for correct input
     for user in data['users']:
         if data['users'][user]['email'] == email:
@@ -51,7 +49,7 @@ def auth_register(email, password, name_first, name_last):
     handle = handle[:20]
     
     #checking if the handle has been used
-    if handle in data['handles'] and len(handle) > 19:
+    if handle in data['handles'] and len(handle) >= 20:
         handle = handle[:-len(str(userId))] + str(userId)
 
     elif handle in data['handles']:
@@ -81,11 +79,12 @@ def auth_register(email, password, name_first, name_last):
     return ret
 
 # quick tests to see if it works
-auth_register('test@email.com', 'password', 'Wilson', 'Guo')
-# print(data)
 # auth_register('test@email.com', 'password', 'Wilson', 'Guo')
 # print(data)
-auth_login('test@email.com', 'password')
+print(auth_register('test@email.com', 'password', 'Wilson', 'Guo'))
+print(data)
+print(auth_login('test@email.com', 'password'))
+
 # auth_register('test@email.com', 'password', 'anamethatismorethantwentychars', 'Lasdfas')
 # print(data)
 # auth_register('test@email.com', 'password', 'anamethatismorethantwentychars', 'Lasdfas')
