@@ -17,16 +17,20 @@ userId = 1
 
 def auth_login(email, password):
 
+    global userId
+    global tokenId
+
     #Doesnt work yet
 
-    #Checking for correct input
+    # Checking for correct input
     for user in data['users']:
-        if user['email'] == email:
-            if user['password'] == password:
+        if data['users'][user]['email'] == email:
+            if data['users'][user]['password'] == password:
                 ret = {
                     'u_id': userId,
                     'token': tokenId,
                 }
+
                 userId += 1
                 tokenId += 1
                 return ret
@@ -38,15 +42,9 @@ def auth_logout(token):
     }
 
 def auth_register(email, password, name_first, name_last):
+   
     global userId
     global tokenId
-
-    newUser = {
-        'name_first': name_first,
-        'name_last': name_last,
-        'email': email,
-        'password': password,
-    }
 
     #Generating user handle and limiting to 20 chars
     handle = name_first.lower() + name_last.lower()
@@ -57,13 +55,19 @@ def auth_register(email, password, name_first, name_last):
         handle = handle[:-len(str(userId))] + str(userId)
 
     elif handle in data['handles']:
-        handle = handle + str(userId - 1)
+        handle = handle + str(userId)
 
-    #adding the registered user to global dict
-    #adding the handle to the users dictionary?
-    data['users'][userId] = {'handle' : handle}
+    #saving user info into a new dict
+    newUser = {
+        'email': email,
+        'password': password,
+        'handle': handle,
+    }
 
-    #checking if the handle has been used
+    #adding user info to global dict
+    data['users'][userId] = newUser
+
+    #Saves the handle name
     data['handles'][handle] = True
 
     ret =  {
@@ -78,10 +82,10 @@ def auth_register(email, password, name_first, name_last):
 
 # quick tests to see if it works
 auth_register('test@email.com', 'password', 'Wilson', 'Guo')
-print(data)
-auth_register('test@email.com', 'password', 'Wilson', 'Guo')
-print(data)
-# auth_login('test@email.com', 'password')
+# print(data)
+# auth_register('test@email.com', 'password', 'Wilson', 'Guo')
+# print(data)
+auth_login('test@email.com', 'password')
 # auth_register('test@email.com', 'password', 'anamethatismorethantwentychars', 'Lasdfas')
 # print(data)
 # auth_register('test@email.com', 'password', 'anamethatismorethantwentychars', 'Lasdfas')
