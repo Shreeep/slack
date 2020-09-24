@@ -6,6 +6,10 @@ data = {
 
     },
 
+    'handles' : {
+
+    }
+
 }
 
 tokenId = 1
@@ -45,14 +49,22 @@ def auth_register(email, password, name_first, name_last):
     #Generating user handle and limiting to 20 chars
     handle = name_first.lower() + name_last.lower()
     handle = handle[:20]
-
+    
     #adding the registered user to global dict
     #along with the user handle
-    data['users'][userId] = { 'handle' : handle}
-    
-    
+    data['users'][userId] = {'handle' : handle}
+
+    #checking if the handle has been used
+    if handle in data['handles'] and len(handle) > 19:
+        handle = handle[:-len(str(userId))] + str(userId)
+
+    else:
+        handle = handle + str(userId)
 
 
+    data['handles'][handle] = True
+
+    
     ret =  {
         'u_id': userId,
         'token': tokenId,
@@ -71,6 +83,10 @@ def auth_register(email, password, name_first, name_last):
 
 auth_register('test@email.com', 'password', 'Wilson', 'Guo')
 print(data)
+auth_register('test@email.com', 'password', 'Wilson', 'Guo')
+print(data)
 print()
+auth_register('test@email.com', 'password', 'anamethatismorethantwentychars', 'Lasdfas')
+print(data)
 auth_register('test@email.com', 'password', 'anamethatismorethantwentychars', 'Lasdfas')
 print(data)
