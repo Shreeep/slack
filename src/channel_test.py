@@ -1,7 +1,7 @@
 import channel
 import pytest
 import data
-from error import InputError
+import error
 
 def test_channel_invite():
     channel.channel_invite("faweebawoowaba",123,456)
