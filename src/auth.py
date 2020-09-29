@@ -1,3 +1,4 @@
+import re
 
 #global variable to store the user data
 data = {
@@ -19,6 +20,10 @@ def auth_login(email, password):
 
     global userId
     global tokenId
+    emailRegex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+
+    if not re.search(emailRegex,email):
+        raise Exception(f"{email} is not valid")
 
     # Checking for correct input
     for user in data['users']:
@@ -32,7 +37,10 @@ def auth_login(email, password):
                 userId += 1
                 tokenId += 1
                 return ret
+            else:
+                raise Exception(f"Password is incorrect")
                 
+    raise Exception(f"{email} is not registered")
 
 def auth_logout(token):
     return {
@@ -78,14 +86,3 @@ def auth_register(email, password, name_first, name_last):
 
     return ret
 
-# quick tests to see if it works
-# auth_register('test@email.com', 'password', 'Wilson', 'Guo')
-# print(data)
-print(auth_register('test@email.com', 'password', 'Wilson', 'Guo'))
-print(data)
-print(auth_login('test@email.com', 'password'))
-
-# auth_register('test@email.com', 'password', 'anamethatismorethantwentychars', 'Lasdfas')
-# print(data)
-# auth_register('test@email.com', 'password', 'anamethatismorethantwentychars', 'Lasdfas')
-# print(data)
