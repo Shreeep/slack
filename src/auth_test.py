@@ -12,7 +12,11 @@ def test_login_fail():
 	register1 = auth.auth_register("test1@email.com", "password", "Wilson", "Guo")
 	with pytest.raises(Exception) as e:
 		auth.auth_login("wrong@email.com", "password") 
+
+	with pytest.raises(Exception) as e:
 		auth.auth_login("test1@email.com", "wrongpassword")
+
+	with pytest.raises(Exception) as e:
 		auth.auth_login("notvalidemail", "password")
 
 
@@ -24,7 +28,15 @@ def test_register_success():
 def test_register_fail():
 	with pytest.raises(Exception) as e:
 		auth.auth_register("anotherinvalidemail", "password", "Register", "Fails")
+		
+	with pytest.raises(Exception) as e:
 		auth.auth_register("alreadyused@email.com", "password", "Person", "Another")
+
+	with pytest.raises(Exception) as e:
 		auth.auth_register("shortpassword@email.com", "12345", "Short", "Password")
+
+	with pytest.raises(Exception) as e:
 		auth.auth_register("namelong@email.com", "password", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", "surname")
+
+	with pytest.raises(Exception) as e:
 		auth.auth_register("surnamelong@email.com", "password", "name", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")

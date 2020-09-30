@@ -1,10 +1,11 @@
 import re
 import data
 
+email_regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
+
 def auth_login(email, password):
 
-    email_regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-
+    #checking if valid email
     if not re.search(email_regex,email):
         raise Exception(f"{email} is not valid")
 
@@ -31,6 +32,10 @@ def auth_logout(token):
     }
 
 def auth_register(email, password, name_first, name_last):
+
+    #checking if valid email
+    if not re.search(email_regex,email):
+        raise Exception(f"{email} is not valid")
 
     #Generating user handle and limiting to 20 chars
     handle = name_first.lower() + name_last.lower()
