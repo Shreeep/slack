@@ -63,16 +63,28 @@ def test_channel_join_success():
 def test_channel_join_input_error():
     #user attemps to join an invalid channel (doesn't exist)
     with pytest.raises(InputError) as e:
-        channel.channel_join('token', 9999) # Expect fail since channel9999 was never created
+        channel.channel_join('token', -1) # Expect fail since -1 should not be a valid channel id
 
 
 def test_channel_join_access_error():
+    #create a private channel
     channel_id = channels.channels_create('token', 'generic_name', False)
     #user attemps to join a channel which is private && authorised user is not a global owner
     with pytest.raises(AccessError) as e:
         #error should be raised if channel with ch_id 1, is a private channel
-        channel.channel_join('token', channel_id) # Expect fail since user0 never joined channel1
+        channel.channel_join('token', channel_id)
 
 
 
 #tests for channel_addowner
+def test_channel_addowner_success():
+    #run channel_addowner
+    #use channel_detail to ensure that user is part of the channel
+    pass
+
+
+def test_channel_addowner_input_error():
+    pass
+
+def test_channel_addowner_access_error():
+    pass
