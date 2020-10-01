@@ -31,13 +31,13 @@ def test_register_fail():
         assert auth.auth_register("anotherinvalidemail", "password", "Register", "Fails")
         
     with pytest.raises(InputError) as e:
-        auth.auth_register("alreadyused@email.com", "password", "Person", "Another")
+        assert auth.auth_register("alreadyused@email.com", "password", "Person", "Another")
 
     with pytest.raises(InputError) as e:
-      assert auth.auth_register("shortpassword@email.com", "12345", "Short", "Password")
+        assert auth.auth_register("shortpassword@email.com", "12345", "Short", "Password")
 
     with pytest.raises(InputError) as e:
-      assert auth.auth_register("namelong@email.com", "password", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", "surname")
+        assert auth.auth_register("namelong@email.com", "password", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz", "surname")
 
     with pytest.raises(InputError) as e:
-     assert  auth.auth_register("surnamelong@email.com", "password", "name", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")
+        assert  auth.auth_register("surnamelong@email.com", "password", "name", "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz")
