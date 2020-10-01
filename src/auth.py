@@ -32,7 +32,7 @@ def auth_login(email, password):
 
 def auth_logout(token):
 
-    # for token in data.data['token']:
+    # Checking if the token has been saved
     if token in data.data['token']:
         data.data['token'].pop(token)
         return {
