@@ -1,47 +1,65 @@
 import channels
 import channel
+import auth
 import pytest 
 import error 
+import data
 
-#Notes: 
-    #channels_list is a subset of channels_listall
-    #channels_list and channels_listall return a list of dictionaries, where each dictionary contains {channel_id, name}
-    #Test Cases for channels_list(): 
-        #User is apart of a channel - returns that channel 
-        #No channels the user is apart of - returns an empty list 
-        #User is apart of all channels - returns list of all channels 
-        #User is apart of some channels, not all - returns list which is subset of all channels 
-    #Test Cases for channels_listall():
-        #No channels asscociated with the token - returns empty list
-    #Test Cases for channels_create(): 
-        #Channel name alredy exists 
-        #Channel name is above 20 characters 
-
+#Testing if {user, token} is apart of channel - it should return the asscoiated channel 
 def test_channels_list():
-    test_channel_one = channels.channels_create('random token', 'Channel #1', True)
-    channel.channel_join('random token', test_channel_one) #does the token tell us which user to join the channel?? 
-    result = channels.channels_list('random token')
-    assert result == {
+    test_channel_one = channels.channels_create('random token', 'Public Channel', True)
+    assert channels.channels_list('random token') == {
         'channels': [
         	{
         		'channel_id': test_channel_one,
-        		'name': 'Channel #1',
+        		'name': 'Public Channel',
         	}
         ],
     }
 
+#Testing if function returns empty list in case of a {user, token} not being apart of any channels 
 def test_channels_list_empty(): 
-    assert channels.channels_list('token') == {}
+    result = auth.auth_register('test@email.com', '123abc', 'Big', 'Chungus') 
+    assert channels.channels_list(result['token']) == {}
 
+#channels_listall should return both Public and Private channels associated with user1 and user2 
+#Assuming return value will be the same for all tokens passed through since it is ALL channels 
 def test_channels_listall():
-    assert channels.channels_listall() == 
+    user1 = auth.auth_register('testa@email.com', 'qwer', 'Hugh', 'Mungus')
+    user2 = auth.auth_register('testb@email.com', 'abc123', 'Hasm', 'Spasm')
+    channels.channels_create(user1['token'], 'User 1s Channel', True) #Public Channel
+    channels.channels_create(user2['token'], 'User 2s Channel', False) #Private Channel
+    assert channels.channels_listall(user1['token']) == data.data['channels'] 
 
+#Two users with no channels
+#Should return an empty list
 def test_channels_listall_empty():
-    assert == {}
+    user1 = auth.auth_register('testc@email.com', 'qwdss34er', 'Bugh', 'Dungus')
+    user2 = auth.auth_register('testd@email.com', 'abcqwe123', 'Sasm', 'Pasm')
+    assert channels.channels_listall(user1['token']) == {} and channels.channels_listall(user2['token']) == {}
 
+#Testing if creates a public channel
 def test_channels_create_public():
-    new_channel = channels.channels_create('token', 'My Channel', True)
-    assert new_channel == ch_id
-def test_channels_create_private():
+    user1 = auth.auth_register('teste@email.com', 'qweweerr', 'Jake', 'Johnson')
+    public_channel = channels.channels_create(user1['token'], 'User1s Channel', True)
+    assert public_channel == data.data['channels']['id'] and data.data['channels']['is_public'] == True
 
-def test_channels_create_already_exists():
+#Testing if creates a private channel
+def test_channels_create_private():
+    user1 = auth.auth_register('testf@email.com', 'qsdf', 'Matthew', 'Mughus')
+    public_channel = channels.channels_create(user1['token'], 'User1s Channel', False)
+    assert public_channel == data.data['channels']['id'] and data.data['channels']['is_public'] == False
+
+
+#Input Error should be raised if channel name is more than 20 characters long i.e. len(channel_name) > 20
+def test_channels_create_input_error():
+    user1 = auth.auth_register('teste@email.com', 'qsdasdf', 'Matthew', 'Mahogonny')
+    public_channel = channels.channels_create(user1['token'], '123456789101213141516171819', True)
+    with pytest.raises(InputError) as e:
+        assert len(data.data['channels']['name']) <= 20
+
+
+
+
+
+
