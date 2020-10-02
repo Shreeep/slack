@@ -11,7 +11,6 @@ def channel_invite(token, channel_id, u_id):
     # find target user and token user
     target_user = data.data['users'][u_id]
     user_id = data.data['tokens'][token]
-    user = data.data['users'][user_id]
     # find channel by channel_id
     check_if_valid_channel_and_member(channel_id, user_id)
     member_dict = {
@@ -35,12 +34,11 @@ def channel_details(token, channel_id):
     for channel in data.data['channels']:
         if channel['id'] == channel_id:
             result = {
-                'name' = channel['name'],
-                'owner_members' = channel['owners']
-                'all_members' = channel['members']
+                'name': channel['name'],
+                'owner_members': channel['owners'],
+                'all_members': channel['members'],
             }
             break
-    }
     return result
 
 def channel_messages(token, channel_id, start):
@@ -52,7 +50,6 @@ def channel_messages(token, channel_id, start):
         if channel['id'] == channel_id:
             messages = channel['messages']
             break
-    }
     span = 50
     result = []
     if start >= len(messages):
@@ -95,4 +92,3 @@ def check_if_valid_channel_and_member(channel_id, u_id):
                 raise AccessError
             return
     raise InputError
-    return
