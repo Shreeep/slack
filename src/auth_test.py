@@ -10,7 +10,6 @@ def test_register_success():
     assert register1['u_id'] != None and register1['token'] != None
     assert register2['u_id'] != None and register2['token'] != None
 
-
 def test_register_fail():
     clear()
     with pytest.raises(InputError) as e:
@@ -29,6 +28,9 @@ def test_register_fail():
     with pytest.raises(InputError) as e:
         assert  auth.auth_register('surnamelong@email.com', 'password', 'name', 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
 
+    with pytest.raises(InputError) as e:
+        assert auth.auth_register('', 'password', 'Register', 'Fails')
+
 def test_login_success():
     clear()
     register1 = auth.auth_register('test@email.com', 'password', 'Wilson', 'Guo')
@@ -38,19 +40,17 @@ def test_login_success():
     assert login1['u_id'] == register1['u_id']
     assert login2['u_id'] == register2['u_id']
 
-
 def test_login_fail():
     clear()
     auth.auth_register('test1@email.com', 'password', 'Wilson', 'Guo')
+    with pytest.raises(InputError) as e:
+        assert auth.auth_login('notvalidemail', 'password')
+
     with pytest.raises(InputError) as e:
         assert auth.auth_login('wrong@email.com', 'password') 
 
     with pytest.raises(InputError) as e:
         assert auth.auth_login('test1@email.com', 'wrongpassword')
-
-    with pytest.raises(InputError) as e:
-        assert auth.auth_login('notvalidemail', 'password')
-
 
 def test_logout_success():
     clear()
@@ -62,7 +62,9 @@ def test_logout_success():
 
 def test_logout_fail():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
-    assert auth.auth_logout('invalidtoken') == {'is_success' : False}
+    with pytest.raises(AccessError) as e:
+        register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+        auth.auth_logout('invalidtoken')
+
 
 

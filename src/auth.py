@@ -6,50 +6,52 @@ email_regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
 
 def auth_login(email, password):
 
-    #checking if valid email
+    # Checking if valid email
     if not re.search(email_regex,email):
         raise InputError
 
     # Checking for correct input
-    # Loop through the data 
+    # Loop through the data dictionary
     for user in data.data['users']:
-        # Checks the data file 
+        # Checks the data dictionary for the correct email and password
         if data.data['users'][user]['email'] == email:
             if data.data['users'][user]['password'] == password:
                 token = data.token_string + str(data.token_id)
+
                 ret = {
                     'u_id': user,
                     'token': token,
                 }
 
-                # Adding to the token dictionary
+                # Adds to the token dictionary
                 data.data['token'][token] = user
 
                 data.user_id += 1
                 data.token_id += 1
                 return ret
             else:
+                # Password is incorrect
                 raise InputError
-                
+
+    # Email not found in the data           
     raise InputError
 
 def auth_logout(token):
 
-    # Checking if the token has been saved
+    # Checking if the token exists
     if token in data.data['token']:
-        # remove the token from the token dictionary
+        # Remove the token from the token dictionary
         data.data['token'].pop(token)
         return {
             'is_success': True,
         }
     else:
-        return {
-            'is_success': False,
-        }
+        # Invalid token
+        raise AccessError
 
 def auth_register(email, password, name_first, name_last):
 
-    # checking if valid email
+    # Checking if valid email
     if not re.search(email_regex,email):
         raise InputError
 
@@ -57,18 +59,28 @@ def auth_register(email, password, name_first, name_last):
     handle = name_first.lower() + name_last.lower()
     handle = handle[:20]
     
-    #checking if the handle has been used
+    # checking if the handle has been used
+    # make sure handle is within 20 chars after making handle unique
     if handle in data.data['handles'] and len(handle) >= 20:
         handle = handle[:-len(str(data.user_id))] + str(data.user_id)
 
     elif handle in data.data['handles']:
         handle = handle + str(data.user_id)
 
-    # saving user info into a new dict
+    # Checking if the dictionary is empty
+    # make the first registered user in the dictionary global owner
+    is_global_owner = False
+    if len(data.data['users']) == 0:
+        is_global_owner = True
+
+    # saving new user info into a new dict
     new_user = {
         'email': email,
         'password': password,
+        'name_first': name_first,
+        'name_last': name_last,
         'handle_str': handle,
+        'is_global_owner': is_global_owner
     }
 
     # checking whether the email has been registered before
@@ -77,7 +89,7 @@ def auth_register(email, password, name_first, name_last):
             raise InputError
 
     # Checking whether the password is valid
-    if len(new_user['password']) < 7:
+    if len(new_user['password']) < 6:
         raise InputError
 
     # first name is between 1 - 50
@@ -88,11 +100,13 @@ def auth_register(email, password, name_first, name_last):
     if len(name_last) < 1 or len(name_last) > 50:
         raise InputError
 
-    # adding user info to global dict
+    # adding new user info to global data dict
     data.data['users'][data.user_id] = new_user
 
     # Saves the handle name
     data.data['handles'][handle] = True
+
+    # making unique token
     token = data.token_string + str(data.token_id)
 
     ret =  {
@@ -107,18 +121,3 @@ def auth_register(email, password, name_first, name_last):
     data.token_id += 1
 
     return ret
-
-# auth_register("test@email.com", "password", "Wilson", "Guo")
-# auth_register("tes2t@email.com", "password", "Wilson", "Guo")
-# print(data.data)
-# # auth_logout(1)
-# # auth_login("test@email.com", "password")
-# # print(data.data)
-# print(data.data['users'].values())
-
-
-# register1 = auth_register("test@email.com", "password", "Wilson", "Guo")
-# register2 = auth_register("working@email.com", "workingPassword", "Test", "Name")
-# print(auth_login("test@email.com", "password")) #change user_id to match register
-# print(auth_login("working@email.com", "workingPassword"))
-# print(data.data)
