@@ -1,8 +1,10 @@
+import channel 
+
 def channels_list(token):
     return {
         'channels': [
         	{
-        		'channel_id': 1,
+        		'channel_id': 2,
         		'name': 'My Channel',
         	}
         ],
@@ -17,6 +19,7 @@ def channels_listall(token):
         	}
         ],
     }
+
 
 def channels_create(token, name, is_public):
     return {
