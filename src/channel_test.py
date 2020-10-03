@@ -10,9 +10,9 @@ def test_channel_invite_success():
     user2 = auth.auth_register('user22@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
     public_channel_id = channels.channels_create(user1['token'],"channel12",1)
     channel.channel_invite(user1['token'],public_channel_id,user2['u_id'])
-    for channel in data.data['channels']:
-        if public_channel_id == channel['id']:
-            assert any(user2['u_id'] == uid for uid in channel[members])
+    for chan in data.data['channels']:
+        if public_channel_id == chan['id']:
+            assert any(user2['u_id'] == uid for uid in chan['members'])
 
 def test_channel_invite_failure():
     user1 = auth.auth_register('user13@gmail.com', '123abc!@#', 'Hayden', 'Everest')
@@ -28,12 +28,12 @@ def test_channel_details_success():
     user1 = auth.auth_register('user14@gmail.com', '123abc!@#', 'Hayden', 'Everest')
     user2 = auth.auth_register('user24@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
     public_channel_id = channels.channels_create(user1['token'],"channel14",1)
-    for channel in data['channels']:
-        if public_channel_id == channel['id']:
+    for chan in data.data['channels']:
+        if public_channel_id == chan['id']:
             result = {
-                'name': channel['name'],
-                'owner_members': channel['owners'],
-                'all_members': channel['members'],
+                'name': chan['name'],
+                'owner_members': chan['owners'],
+                'all_members': chan['members'],
             }
             assert channel.channel_details(user1['token'],public_channel_id) == result
 
@@ -50,9 +50,9 @@ def test_channel_messages_success():
     user1 = auth.auth_register('user16@gmail.com', '123abc!@#', 'Hayden', 'Everest')
     user2 = auth.auth_register('user26@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
     public_channel_id = channels.channels_create(user1['token'],"channel16",1)
-    for channel in data['channels']:
-        if public_channel_id == channel['id']:
-            channel['messages'] = [
+    for chan in data.data['channels']:
+        if public_channel_id == chan['id']:
+            chan['messages'] = [
                     {
                     'message_id': 1,
                     'u_id': 1,
@@ -66,8 +66,8 @@ def test_channel_messages_success():
                     'time_created': 1582426790,
                     },
                 ]
-            result = channel['messages']
-    assert channel.channel_messages(user1['token'],public_channel_id) == {
+            result = chan['messages']
+    assert channel.channel_messages(user1['token'],public_channel_id,0) == {
         'messages': result,
         'start': 0,
         'end': -1,
@@ -77,9 +77,9 @@ def test_channel_messages_failure():
     user1 = auth.auth_register('user17@gmail.com', '123abc!@#', 'Hayden', 'Everest')
     user2 = auth.auth_register('user27@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
     public_channel_id = channels.channels_create(user1['token'],"channel17",1)
-    for channel in data['channels']:
-        if public_channel_id == channel['id']:
-            channel['messages'] = [
+    for chan in data.data['channels']:
+        if public_channel_id == chan['id']:
+            chan['messages'] = [
                     {
                     'message_id': 1,
                     'u_id': 1,
@@ -98,4 +98,3 @@ def test_channel_messages_failure():
     with pytest.raises(InputError) as e:
         channel.channel_messages(user1['token'],25,0)
         channel.channel_messages(user1['token'],public_channel_id,30)
-
