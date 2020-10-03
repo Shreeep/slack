@@ -3,7 +3,7 @@ import auth
 import channels
 import pytest
 import data
-import error
+from error import InputError, AccessError
 
 def test_channel_invite_success():
     user1 = auth.auth_register('user12@gmail.com', '123abc!@#', 'Hayden', 'Everest')
@@ -33,16 +33,16 @@ def test_channel_details_success():
         'name': 'channel14',
         'owner_members': [
             {
-                'u_id': 1,
+                'u_id': user1['u_id'],
                 'name_first': 'Hayden',
-                'name_last': 'Jacobs',
+                'name_last': 'Everest',
             }
         ],
         'all_members': [
             {
-                'u_id': 1,
+                'u_id': user1['u_id'],
                 'name_first': 'Hayden',
-                'name_last': 'Jacobs',
+                'name_last': 'Everest',
             }
         ],
     }
