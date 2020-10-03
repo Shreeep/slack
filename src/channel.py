@@ -132,14 +132,12 @@ def channel_addowner(token, channel_id, u_id):
         if channel['id'] == channel_id:
             if any(u_id == owner['u_id'] for owner in channel['owners']):
                 raise InputError
-    #access error when auth_user is not an owner of the channel
+    #access error when auth_user is not an owner of the channel or a global owner
     for channel in data.data['channels']:
         if channel['id'] == channel_id:
-            if not any(auth_user_id == owner['u_id'] for owner in channel['owners']):
+            if not ((any(auth_user_id == owner['u_id'] for owner in channel['owners'])) or (data.data['users'][auth_user_id]['is_global_owner'])):
                 raise AccessError
-    #access error when auth_user is not a global owner
-    if not data.data['users'][auth_user_id]['is_global_owner']:
-        raise AccessError
+
 
     #acess error if token is not a valid token
     if not token in data.data['tokens']:
@@ -180,14 +178,11 @@ def channel_removeowner(token, channel_id, u_id):
         if channel['id'] == channel_id:
             if any(u_id == owner['u_id'] for owner in channel['owners']):
                 raise InputError
-    #access error when auth_user is not an owner of the channel
+    #access error when auth_user is not an owner of the channel or global owner
     for channel in data.data['channels']:
         if channel['id'] == channel_id:
-            if not any(auth_user_id == owner['u_id'] for owner in channel['owners']):
+            if not (any(auth_user_id == owner['u_id'] for owner in channel['owners'])) or (data.data['users'][auth_user_id]['is_global_owner']):
                 raise AccessError
-    #access error when auth_user is not a global owner
-    if not data.data['users'][auth_user_id]['is_global_owner']:
-        raise AccessError
 
     #acess error if token is not a valid token
     if not token in data.data['tokens']:
