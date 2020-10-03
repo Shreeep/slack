@@ -4,16 +4,17 @@ data = {
             'email': 'asdas@gmail.com',
             'password': 'password',
             'name_first': 'name_first',
-            'name_laste': 'name_last',
+            'name_last': 'name_last',
             'handle_str': 'handle',
             'is_global_owner' : True
         },
         2: {
-            'email': email,
-            'password': password,
-            'name_first': name_first,
-            'name_laste': name_last,
-            'handle_str': handle,
+            'email': 'email@poomail.com',
+            'password': 'password',
+            'name_first': 'name_first',
+            'name_last': 'name_last',
+            'handle_str': 'handle',
+            'is_global_owner': False
         },
     },
     'channels': [
