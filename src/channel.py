@@ -43,6 +43,7 @@ def channel_leave(token, channel_id):
 
     auth_user_id = data.data['tokens'][token]
 
+
     #input error if channel_id is not a valid channel
     if not any(channel['id'] == channel_id for channel in data.data['channels']):
         raise InputError
@@ -52,6 +53,10 @@ def channel_leave(token, channel_id):
         if channel['id'] == channel_id:
             if not any(auth_user_id == member['u_id'] for member in channel['members']):
                 raise AccessError
+
+    #acess error if token is not a valid token
+    if not token in data.data['tokens']:
+        raise AccessError
 
 
     #searching for the correct channel
@@ -94,7 +99,9 @@ def channel_join(token, channel_id):
                 if channel[is_public] == False:
                     raise AccessError
 
-
+    #acess error if token is not a valid token
+    if not token in data.data['tokens']:
+        raise AccessError
 
     new_member = {
         'u_id' : auth_user_id,
@@ -134,6 +141,9 @@ def channel_addowner(token, channel_id, u_id):
     if not data.data['users'][auth_user_id]['is_global_owner']:
         raise AccessError
 
+    #acess error if token is not a valid token
+    if not token in data.data['tokens']:
+        raise AccessError
 
     name_first = data.data['users'][u_id][name_first]
     name_last = data.data['users'][u_id][name_last]
@@ -179,7 +189,9 @@ def channel_removeowner(token, channel_id, u_id):
     if not data.data['users'][auth_user_id]['is_global_owner']:
         raise AccessError
 
-
+    #acess error if token is not a valid token
+    if not token in data.data['tokens']:
+        raise AccessError
 
     #search for channel with channel_id
     for channel in data.data['channels']:
