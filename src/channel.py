@@ -173,10 +173,10 @@ def channel_removeowner(token, channel_id, u_id):
     #input error when a)channel ID is not a valid channel
     if not any(channel['id'] == channel_id for channel in data.data['channels']):
         raise InputError
-    #input error when b) u_id is already an owner of the channel
+    #input error when b) u_id is not already an owner of the channel
     for channel in data.data['channels']:
         if channel['id'] == channel_id:
-            if any(u_id == owner['u_id'] for owner in channel['owners']):
+            if not any(u_id == owner['u_id'] for owner in channel['owners']):
                 raise InputError
     #access error when auth_user is not an owner of the channel or global owner
     for channel in data.data['channels']:

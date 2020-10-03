@@ -112,7 +112,7 @@ def test_channel_addowner_input_error2():
     other.clear():
     user1 = auth.auth_register('haha@gmail.com', 'Password123123', 'Shree', 'Nath')
     new_channel_id = channels.channels_create(user1['token'],'myEpicChannel', True)
-    with pytest.raises(AccessError) as e:
+    with pytest.raises(InputError) as e:
         channel.channel_addowner(user1['token'], new_channel_id['channel_id'], user1['u_id'])
 
 #accesserror when auth_user is not an owner of the channel
@@ -184,17 +184,63 @@ def test_channel_addowner_channel_owner_success():
 
 #tests for channel_removeowner
 
-def test_channel_removeowner_InputError1():
+def test_channel_removeowner_InputError_invalid_channel():
     other.clear():
     user1 = auth.auth_register('haha@gmail.com', 'Password123123', 'Shree', 'Nath')
     with pytest.raises(InputError) as e:
         channel.channel_removeowner(user1['token'], -2) # Expect fail since channel-2 doesn't exist
 
-def test_channel_removeowner_InputError2():
-    pass
+def test_channel_removeowner_InputError_not_owner():
+    other.clear():
+    user1 = auth.auth_register('haha@gmail.com', 'Password123123', 'Shree', 'Nath')
+    user2 = auth.auth_register('haha2@gmail.com', 'Aaa123123ffff', 'Aeep', 'Path')
+    #user1 creates channel
+    new_channel_id = channels.channels_create(user1['token'],'myEpicChannel', True)
+    with pytest.raises(InputError) as e:
+        #input error when trying to remove user2 as an owner
+        channel.channel_removeowner(user1['token'], new_channel_id['channel_id'], user2['u_id'])
 
 def test_channel_removeowner_AccessError():
-    pass
-
-def test_channel_removeowner_success():
     other.clear():
+    user1 = auth.auth_register('haha@gmail.com', 'Password123123', 'Shree', 'Nath')
+    user2 = auth.auth_register('haha2@gmail.com', 'Aaa123123ffff', 'Aeep', 'Path')
+    #user1 creates channel
+    new_channel_id = channels.channels_create(user1['token'],'myEpicChannel', True)
+    with pytest.raises(AccessError) as e:
+        #access error because user is not a global_owner, or a channel owner
+        channel.channel_removeowner(user2['token'], new_channel_id['channel_id'], user1['u_id'])
+
+
+def test_channel_removeowner_success_channel_owner():
+    other.clear():
+    user1 = auth.auth_register('haha@gmail.com', 'Password123123', 'Shree', 'Nath')
+    user2 = auth.auth_register('haha2@gmail.com', 'Aaa123123ffff', 'Aeep', 'Path')
+    #user1 creates channel
+    new_channel_id = channels.channels_create(user1['token'],'myEpicChannel', True)
+    channel.channel_addowner(user1['token'], new_channel_id['channel_id'], user2['u_id'])
+    channel.channel_removeowner(user1['token'], new_channel_id['channel_id'], user2['u_id'])
+    user1s_channel = channel.channel_details(user1['token'], new_channel_id['channel_id'])
+    assert user1s_channel['owner_members'] == [
+        {
+            'u_id': user1['u_id'],
+            'name_first': 'Shree',
+            'name_last': 'Nath',
+        }
+    ]
+
+def test_channel_removeowner_success_global_owner():
+    other.clear():
+    user1 = auth.auth_register('haha@gmail.com', 'Password123123', 'Shree', 'Nath')
+    user2 = auth.auth_register('haha2@gmail.com', 'Aaa123123ffff', 'Aeep', 'Path')
+    user3 = auth.auth_register('haha3@gmail.com', 'Asdssdd23232', 'Aeeree', 'Bath')
+    new_channel_id = channels.channels_create(user2['token'],'myEpicChannel', True)
+    channel.channel_addowner(user2['token'], new_channel_id['channel_id'], user3['u_id'])
+    channel.channel_removeowner(user1['token'], new_channel_id['channel_id'], user3['u_id'])
+    user2s_channel = channel.channel_details(user2['token'], new_channel_id['channel_id'])
+    assert user2s_channel['owner_members'] == [
+        {
+            'u_id': user2['u_id'],
+            'name_first': 'Aeep',
+            'name_last': 'Path',
+        }
+    ]
