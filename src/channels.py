@@ -5,29 +5,53 @@ import data
 
 def channels_list(token):
 
-
-
-
-    '''
-    return {
-        'channels': [
-            {
-                'channel_id': 2,
-                'name': 'My Channel',
-            }
-        ],
+    #Intialise an empty dictionary that has a 'channels' list
+    user_channels = {
+        'channels':[]
     }
-    '''
+
+    #Get user's id, name_first, name_last to see if they are a member of a channel
+    user_id = data.data['tokens'][token]
+    user_info = {
+        'u_id': user_id,
+        'name_first': data.data['users'][user_id]['name_first'],
+        'name_last': data.data['users'][user_id]['name_last'],
+    }
+
+    #Search through each channel in data
+    for channel in data.data['channels']:
+        #Keep track of the current channel id and channel name 
+        #If we find that the user is apart of a particular channel - append it to our user_channels list
+        channel_details = {
+            'channel_id': channel['id'],
+            'name': channel['name'],
+        }
+        #Look through members list since it covers all users
+        for user_search in channel['members']:
+            #Statement is true if the user in question is a member
+            if user_info == user_search: 
+                user_channels['channels'].append(channel_details)
+
+    return user_channels 
+
 
 def channels_listall(token):
-    return {
-        'channels': [
-        	{
-        		'channel_id': 1,
-        		'name': 'My Channel',
-        	}
-        ],
+    #Intialise an empty dictionary that has a 'channels' list
+    all_channels = {
+        'channels': []
     }
+
+    #Search through each channel in data
+    for channel in data.data['channels']:
+        #Store the current channel's name and id
+        channel_details = {
+            'channel_id': channel['id'],
+            'name': channel['name'],
+        }
+        #Add it to the all_channels list
+        all_channels['channels'].append(channel_details)
+
+    return all_channels
 
 
 def channels_create(token, name, is_public):
@@ -82,6 +106,5 @@ def channels_create(token, name, is_public):
                 data.data['channels'][channel_id_searcher]['owners'].append(owner_details)
                 data.data['channels'][channel_id_searcher]['members'].append(owner_details)
                 data.data['channels'].append(new_channel)
-
     return channel_id 
 
