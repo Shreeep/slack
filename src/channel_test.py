@@ -1,42 +1,42 @@
 import channel
+import channels
+import auth
 import pytest
 import data
 import error
+import other
 
-
+#assume: each test starts with an empty data structure and populates it
 #tests for channel_leave
-
-def test_channel_leave_success():
-    #add channel_create
-    #inputs: token (me), ch_id, u_id
-    channel.channel_join('token', 0)
-    result = channels.channels_list('token')
-    assert result = [
-        {
-            'id': 0,
-            'name' : 'channel0',
-        }
-    ]
-    #inputs: token, ch_id
-    channel.channel_leave('token', 0) # Expect to work since we invited user#0 to channel#0
-    assert result = [
-
-    ]
-
 
 def test_channel_leave_input_error():
     #code for exception where Channel ID is not a valid channel
+    other.clear():
+    u_id, token = auth.auth_register('haha@gmail.com', 'Password123123', 'Shree', 'Nath')
     with pytest.raises(InputError) as e:
-        channel.channel_leave('token', 9999) # Expect fail since channel9999 doesn't exist
+        assert channel.channel_leave(token, -2) # Expect fail since channel-2 doesn't exist
 
 
 def test_channel_leave_access_error():
-    #code for exception where Authorised user is not a member of channel with channel_id
-    #invite user0 joins channel0
-    channel.channel_join('token', 0)
-    #accessError when trying to remove user identified by 'token' from channel 1
+#accessError when trying to remove user identified by 'token' from channel 1
+    other.clear():
+    u_id, token = auth.auth_register('haha@gmail.com', 'Password123123', 'Shree', 'Nath')
+    channel_id = channels.channels_create(token,'myEpicChannel', True)
+    #have to leave a channel twice to throw accesserror
+    channel.channel_leave(token, channel_id)
     with pytest.raises(AccessError) as e:
-        channel.channel_leave('token', 1) # Expect fail since user0 never joined channel1
+        #auth_user should no longer be in the channel
+        assert channel.channel_leave(token, channel_id)
+
+
+def test_channel_leave_success():
+    other.clear():
+    u_id, token = auth.auth_register('haha@gmail.com', 'Password123123', 'Shree', 'Nath')
+    #auth user becomes a member + owner, upon channel creation
+    channel_id = channels.channels_create(token,'myEpicChannel', True)
+    channel.channel_leave(token, channel_id)
+    joined_channels = channels_list(token)
+    assert joined_channels['channels'] == []
 
 
 
@@ -52,7 +52,7 @@ def test_channel_join_success():
     #assuming channels_list is working properly, result should be a dictionary
     #of channel0 and channel1, the channels that the user has joined
     result = channels.channels_list(token)
-    assert result = [
+    assert result == [
         {
             'id': 1,
             'name' : 'channel1',

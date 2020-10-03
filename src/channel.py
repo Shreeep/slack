@@ -1,4 +1,4 @@
-import data
+omimport data
 import error
 
 
@@ -61,13 +61,13 @@ def channel_leave(token, channel_id):
             for member in channel['members']:
                 if member['u_id'] == auth_user_id:
                     #removing the user from the channel
-                    del member
+                    channel['members'].remove(member)
 
             #if the user is an owner, also remove them from owners
             for owner in channel['owners']:
                 if owner['u_id'] == auth_user_id:
                     #removing the user from the channel
-                    del owner
+                    channel['owners'].remove(owner)
 
 
     return {
@@ -85,7 +85,6 @@ def channel_join(token, channel_id):
         raise InputError
     #access error when channel_id refers to a channel that
     #is private (when the authorised user is not a global owner)
-
     #if user is not global owner
     if not data.data['users'][auth_user_id]['is_global_owner']:
         #search for the channel
@@ -188,12 +187,12 @@ def channel_removeowner(token, channel_id, u_id):
             #remove the user with u_id as a member
             for member in channel['members']:
                 if member['u_id'] == u_id:
-                    del member
+                    channel['members'].remove(member)
 
             #remove the user with u_id as an owner
             for owner in channel['owners']:
                 if owner['u_id'] == u_id:
-                    del owner
+                    channel['owners'].remove(owner)
 
 
     return {
