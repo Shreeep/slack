@@ -1,3 +1,12 @@
+import data
+
+def clear():
+    data.data['users'] = {}
+    data.data['handles'] = {}
+    data.data['tokens'] = {}
+    data.token_id = 1
+    data.user_id = 1
+    
 def users_all(token):
     return {
         'users': [
@@ -22,3 +31,4 @@ def search(token, query_str):
             }
         ],
     }
+
