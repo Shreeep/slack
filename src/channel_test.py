@@ -8,11 +8,12 @@ import error
 def test_channel_invite_success():
     user1 = auth.auth_register('user12@gmail.com', '123abc!@#', 'Hayden', 'Everest')
     user2 = auth.auth_register('user22@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
+    user3 = auth.auth_register('userwabi@gmail.com', '123abc!@#', 'Richard', 'Dawkins')
     public_channel_id = channels.channels_create(user1['token'],"channel12",1)
+    with pytest.raises(AccessError) as e:
+        channel.channel_invite(user2['token'],public_channel_id,user3['u_id'])
     channel.channel_invite(user1['token'],public_channel_id,user2['u_id'])
-    for chan in data.data['channels']:
-        if public_channel_id == chan['id']:
-            assert any(user2['u_id'] == uid for uid in chan['members'])
+    channel.channel_invite(user2['token'],public_channel_id,user3['u_id'])
 
 def test_channel_invite_failure():
     user1 = auth.auth_register('user13@gmail.com', '123abc!@#', 'Hayden', 'Everest')
@@ -28,14 +29,23 @@ def test_channel_details_success():
     user1 = auth.auth_register('user14@gmail.com', '123abc!@#', 'Hayden', 'Everest')
     user2 = auth.auth_register('user24@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
     public_channel_id = channels.channels_create(user1['token'],"channel14",1)
-    for chan in data.data['channels']:
-        if public_channel_id == chan['id']:
-            result = {
-                'name': chan['name'],
-                'owner_members': chan['owners'],
-                'all_members': chan['members'],
+    assert channel.channel_details(user1['token'],public_channel_id) == {
+        'name': 'channel14',
+        'owner_members': [
+            {
+                'u_id': 1,
+                'name_first': 'Hayden',
+                'name_last': 'Jacobs',
             }
-            assert channel.channel_details(user1['token'],public_channel_id) == result
+        ],
+        'all_members': [
+            {
+                'u_id': 1,
+                'name_first': 'Hayden',
+                'name_last': 'Jacobs',
+            }
+        ],
+    }
 
 def test_channel_details_failure():
     user1 = auth.auth_register('user15@gmail.com', '123abc!@#', 'Hayden', 'Everest')
