@@ -21,7 +21,7 @@ def channel_invite(token, channel_id, u_id):
     all_channels = data.data['channels']
     for channel in all_channels:
         if channel['id'] == channel_id:
-            if not any(u_id == member['id'] for member in channel['members']): 
+            if not any(u_id == member['u_id'] for member in channel['members']): 
                 channel['members'].append(member_dict)        
     return {
     }
@@ -88,7 +88,7 @@ def channel_removeowner(token, channel_id, u_id):
 def check_if_valid_channel_and_member(channel_id, u_id):
     for channel in data.data['channels']:
         if channel['id'] == channel_id:
-            if not any(member['id'] == u_id for member in channel['members']):
+            if not any(member['u_id'] == u_id for member in channel['members']):
                 raise AccessError
             return
     raise InputError
