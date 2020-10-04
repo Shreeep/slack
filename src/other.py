@@ -7,7 +7,7 @@ def clear():
     data.data['channels'] = []
     data.token_id = 1
     data.user_id = 1
-    
+
 def users_all(token):
     return {
         'users': [
