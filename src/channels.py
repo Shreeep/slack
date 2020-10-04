@@ -1,9 +1,10 @@
-import channel 
-import auth
-from error import InputError
+from error import InputError, AccessError
 import data
 
 def channels_list(token):
+
+    if not token in data.data['tokens']:
+        raise AccessError
 
     #Intialise an empty dictionary that has a 'channels' list
     user_channels = {
@@ -33,9 +34,14 @@ def channels_list(token):
                 user_channels['channels'].append(channel_details)
 
     return user_channels 
+    
 
 
 def channels_listall(token):
+
+    if not token in data.data['tokens']:
+        raise AccessError
+
     #Intialise an empty dictionary that has a 'channels' list
     all_channels = {
         'channels': []
@@ -55,6 +61,9 @@ def channels_listall(token):
 
 
 def channels_create(token, name, is_public):
+
+    if not token in data.data['tokens']:
+        raise AccessError
     #Check if name is more than 20 characters long and raise InputError
     if len(name) > 20: 
         raise InputError
@@ -74,8 +83,8 @@ def channels_create(token, name, is_public):
         'name': name,
         'members': [],
         'owners': [],
-        'is public': is_public,
-        'messages': {}, #Empty for Iteration 1
+        'is_public': is_public,
+        'messages': [], #Empty for Iteration 1
     }
 
     #Setting the owner's detail 
@@ -85,6 +94,9 @@ def channels_create(token, name, is_public):
         'name_last': channel_owner_name_last,
     }
 
+    new_channel['members'].append(owner_details)
+    new_channel['owners'].append(owner_details)
+
     #Add new_channel to 'channels' list:
         #if there are no channels add our new_channel created and 
         #else set a new unique channel id and then add the new_channel created above
@@ -92,19 +104,15 @@ def channels_create(token, name, is_public):
     if data.data['channels'] is False:
         #Keeping track of channel_id to return it later
         channel_id = new_channel['id'] 
-        data.data['channels'][0]['owners'].append(owner_details)
-        data.data['channels'][0]['members'].append(owner_details)
         data.data['channels'].append(new_channel)
     else:
         #Check to see if channel id already exists - if it does:
-            #keep adding 1 to new_channel id until it is unique
-        for channel_id_searcher in data.data['channels'][channel_id_searcher]:
-            if new_channel['id'] == data.data['channels'][channel_id_searcher]['id']:
-                new_channel['id'] + 1
-            else:
-                channel_id = new_channel['id']
-                data.data['channels'][channel_id_searcher]['owners'].append(owner_details)
-                data.data['channels'][channel_id_searcher]['members'].append(owner_details)
-                data.data['channels'].append(new_channel)
-    return channel_id 
-
+        #keep adding 1 to new_channel id until it is unique
+        while any(channel['id'] == new_channel['id'] for channel in data.data['channels']):
+            new_channel['id'] += 1
+        data.data['channels'].append(new_channel)
+        channel_id = new_channel['id']
+        
+    return {
+        'channel_id': channel_id,
+    } 
