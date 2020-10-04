@@ -3,8 +3,9 @@ import channels
 import auth
 import pytest
 import data
-import error
+from error import AccessError, InputError
 import other
+
 
 #assume: each test starts with an empty data structure and populates it
 #tests for channel_leave

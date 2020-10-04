@@ -1,5 +1,5 @@
 import data
-import error
+from error import AccessError, InputError
 
 
 def channel_invite(token, channel_id, u_id):
