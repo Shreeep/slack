@@ -3,6 +3,7 @@ import pytest
 from other import clear
 from error import InputError, AccessError
 
+
 def test_register_success():
     clear()
     register1 = auth.auth_register('test@email.com', 'password', 'Wilson', 'Guo')
@@ -12,47 +13,60 @@ def test_register_success():
 
 def test_register_email_input_fail():
     clear()
+    # no @ symbol
     with pytest.raises(InputError) as e:
-        assert auth.auth_register('anotherinvalidemail', 'password', 'Register', 'Fails')
+        auth.auth_register('anotherinvalidemail', 'password', 'Register', 'Fails')
 
+    # no .com
     with pytest.raises(InputError) as e:
-        assert auth.auth_register('test@', 'password', 'Register', 'Fails')
+        auth.auth_register('test@', 'password', 'Register', 'Fails')
 
+    # no string before @
     with pytest.raises(InputError) as e:
-        assert auth.auth_register('@.com', 'password', 'Register', 'Fails')
+        auth.auth_register('@.com', 'password', 'Register', 'Fails')
 
+    # using symbols
     with pytest.raises(InputError) as e:
-        assert auth.auth_register('!!##$$^^&@.com', 'password', 'Register', 'Fails')
+        auth.auth_register('!!##$$^^&@.com', 'password', 'Register', 'Fails')
 
+    # no . after @ 
     with pytest.raises(InputError) as e:
-        assert auth.auth_register('', 'password', 'Register', 'Fails')
+        auth.auth_register('test@com', 'password', 'Register', 'Fails')
+
+    # empty input
+    with pytest.raises(InputError) as e:
+        auth.auth_register('', 'password', 'Register', 'Fails')
         
 def test_register_used_email_fail():
     clear()
+    # used email
     with pytest.raises(InputError) as e:
         auth.auth_register('alreadyused@email.com', 'password', 'New', 'Person')
-        assert auth.auth_register('alreadyused@email.com', 'password', 'Person', 'Another')
+        auth.auth_register('alreadyused@email.com', 'password', 'Person', 'Another')
 
 def test_register_password_length_fail():
     clear()
+    # password limtation
     with pytest.raises(InputError) as e:
-        assert auth.auth_register('shortpassword@email.com', '12345', 'Short', 'Password')
+        auth.auth_register('shortpassword@email.com', '12345', 'Short', 'Password')
 
 def test_register_name_limit_fail():
     clear()
+    # first name limitation
     with pytest.raises(InputError) as e:
-        assert auth.auth_register('namelong@email.com', 'password', 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz', 'surname')
+        auth.auth_register('namelong@email.com', 'password', 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz', 'surname')
 
     with pytest.raises(InputError) as e:
-        assert auth.auth_register('namelong@email.com', 'password', '', 'surname')
+        auth.auth_register('namelong@email.com', 'password', '', 'surname')
 
 def test_register_surname_limit_fail():
     clear()
+    # surnname limitation
     with pytest.raises(InputError) as e:
-        assert  auth.auth_register('surnamelong@email.com', 'password', 'name', 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+        auth.auth_register('surnamelong@email.com', 'password', 'name', 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
         
     with pytest.raises(InputError) as e:
-        assert  auth.auth_register('surnamelong@email.com', 'password', 'name', '')
+        auth.auth_register('surnamelong@email.com', 'password', 'name', '')
 
 
 def test_login_success():
@@ -68,13 +82,13 @@ def test_login_fail():
     clear()
     auth.auth_register('test1@email.com', 'password', 'Wilson', 'Guo')
     with pytest.raises(InputError) as e:
-        assert auth.auth_login('notvalidemail', 'password')
+        auth.auth_login('notvalidemail', 'password')
 
     with pytest.raises(InputError) as e:
-        assert auth.auth_login('wrong@email.com', 'password') 
+        auth.auth_login('wrong@email.com', 'password') 
 
     with pytest.raises(InputError) as e:
-        assert auth.auth_login('test1@email.com', 'wrongpassword')
+        auth.auth_login('test1@email.com', 'wrongpassword')
 
 def test_logout_success():
     clear()
