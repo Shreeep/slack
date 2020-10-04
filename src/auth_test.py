@@ -7,9 +7,11 @@ from error import InputError, AccessError
 def test_register_success():
     clear()
     register1 = auth.auth_register('test@email.com', 'password', 'Wilson', 'Guo')
-    register2 = auth.auth_register('working@email.com', 'workingPassword', 'Test', 'Name')
+    register2 = auth.auth_register('working@email.com', 'workingPassword', 'nineletters', 'lastname')
+    register3 = auth.auth_register('working3@email.com', 'workingPassword', 'nineletters', 'lastname')
     assert register1['u_id'] != None and register1['token'] != None
     assert register2['u_id'] != None and register2['token'] != None
+    assert register3['u_id'] != None and register3['token'] != None
 
 def test_register_email_input_fail():
     clear()
@@ -40,8 +42,8 @@ def test_register_email_input_fail():
 def test_register_used_email_fail():
     clear()
     # used email
+    auth.auth_register('alreadyused@email.com', 'password', 'New', 'Person')
     with pytest.raises(InputError) as e:
-        auth.auth_register('alreadyused@email.com', 'password', 'New', 'Person')
         auth.auth_register('alreadyused@email.com', 'password', 'Person', 'Another')
 
 def test_register_password_length_fail():
