@@ -33,7 +33,7 @@ def auth_login(email, password):
                 # Password is incorrect
                 raise InputError
 
-    # Email not found in the data           
+    # Email not found in the data
     raise InputError
 
 def auth_logout(token):
@@ -58,7 +58,7 @@ def auth_register(email, password, name_first, name_last):
     # Generating user handle and limiting to 20 chars
     handle = name_first.lower() + name_last.lower()
     handle = handle[:20]
-    
+
     # checking if the handle has been used
     # make sure handle is within 20 chars after making handle unique
     if handle in data.data['handles'] and len(handle) >= 20:
@@ -93,7 +93,7 @@ def auth_register(email, password, name_first, name_last):
         raise InputError
 
     # first name is between 1 - 50
-    if len(name_first) < 1 or len(name_first) > 50: 
+    if len(name_first) < 1 or len(name_first) > 50:
         raise InputError
 
     # last name is between 1 - 50
