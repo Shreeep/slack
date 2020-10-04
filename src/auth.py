@@ -24,7 +24,7 @@ def auth_login(email, password):
                 }
 
                 # Adds to the token dictionary
-                data.data['token'][token] = user
+                data.data['tokens'][token] = user
 
                 data.user_id += 1
                 data.token_id += 1
@@ -39,9 +39,9 @@ def auth_login(email, password):
 def auth_logout(token):
 
     # Checking if the token exists
-    if token in data.data['token']:
+    if token in data.data['tokens']:
         # Remove the token from the token dictionary
-        data.data['token'].pop(token)
+        data.data['tokens'].pop(token)
         return {
             'is_success': True,
         }
@@ -115,7 +115,7 @@ def auth_register(email, password, name_first, name_last):
     }
 
     # Adding to the token dictionary
-    data.data['token'][token] = data.user_id
+    data.data['tokens'][token] = data.user_id
 
     data.user_id += 1
     data.token_id += 1
