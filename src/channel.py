@@ -96,7 +96,7 @@ def channel_join(token, channel_id):
         for channel in data.data['channels']:
             if channel['id'] == channel_id:
                 #if this channel is private, raise an accessError
-                if channel[is_public] == False:
+                if channel['is_public'] == False:
                     raise AccessError
 
     #acess error if token is not a valid token
@@ -116,7 +116,7 @@ def channel_join(token, channel_id):
             channel['members'].append(new_member)
             #if user is global_owner, also add auth user as owner
             if data.data['users'][auth_user_id]['is_global_owner']:
-                channel['owner'].append(new_member)
+                channel['owners'].append(new_member)
     return {
     }
 
@@ -143,8 +143,8 @@ def channel_addowner(token, channel_id, u_id):
     if not token in data.data['tokens']:
         raise AccessError
 
-    name_first = data.data['users'][u_id][name_first]
-    name_last = data.data['users'][u_id][name_last]
+    name_first = data.data['users'][u_id]['name_first']
+    name_last = data.data['users'][u_id]['name_last']
 
     new_owner = {
         'u_id' : u_id,
@@ -158,7 +158,7 @@ def channel_addowner(token, channel_id, u_id):
                 channel['members'].append(new_owner)
 
     #add auth user to owers list
-    for channel in data.data['channels']
+    for channel in data.data['channels']:
         if channel['id'] == channel_id:
             channel['owners'].append(new_owner)
 
@@ -173,10 +173,10 @@ def channel_removeowner(token, channel_id, u_id):
     #input error when a)channel ID is not a valid channel
     if not any(channel['id'] == channel_id for channel in data.data['channels']):
         raise InputError
-    #input error when b) u_id is not already an owner of the channel
+    #input error when b) u_id is already an owner of the channel
     for channel in data.data['channels']:
         if channel['id'] == channel_id:
-            if not any(u_id == owner['u_id'] for owner in channel['owners']):
+            if any(u_id == owner['u_id'] for owner in channel['owners']):
                 raise InputError
     #access error when auth_user is not an owner of the channel or global owner
     for channel in data.data['channels']:
