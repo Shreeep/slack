@@ -73,6 +73,7 @@ def channel_messages(token, channel_id, start):
             break
         result.append(messages[index])
         index += 1
+        i += 1
     # if did not reach 50 then end is -1 other wise start + 50
     if ((index - start) == 50):
         end = start + 50
