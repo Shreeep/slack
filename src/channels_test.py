@@ -72,7 +72,7 @@ def test_channels_create_private():
     user1 = auth.auth_register('testf@email.com', 'qsdf123', 'Matthew', 'Mughus')
     private_channel = channels.channels_create(user1['token'], 'User1s Channel', False)
     user2 = auth.auth_register('testfun@gmail.com', '1235asd', 'Bob', 'Thebuilder')
-    with pytest.raises(AccessError) as e:
+    with pytest.raises(AccessError):
         channel.channel_join(user2['token'], private_channel['channel_id'])
 
 
@@ -80,19 +80,19 @@ def test_channels_create_private():
 def test_channels_create_input_error():
     other.clear()
     user1 = auth.auth_register('teste@email.com', 'qsdasdf', 'Matthew', 'Mahogonny')
-    with pytest.raises(InputError) as e:
+    with pytest.raises(InputError):
         channels.channels_create(user1['token'], '123456789101213141516171819', True)
 
 def test_invalid_tokens_for_channels_functions():
     other.clear()
     user1 = auth.auth_register('testc@email.com', 'qwdss34er', 'Bugh', 'Dungus')
-    user2 = auth.auth_register('testd@email.com', 'abcqwe123', 'Sasm', 'Pasm')
-    test_channel_one = channels.channels_create(user1['token'], 'Public Channel', True)
-    with pytest.raises(AccessError) as e:
+    auth.auth_register('testd@email.com', 'abcqwe123', 'Sasm', 'Pasm')
+    channels.channels_create(user1['token'], 'Public Channel', True)
+    with pytest.raises(AccessError):
         channels.channels_list('faweeba' + user1['token'])
-    with pytest.raises(AccessError) as e:
+    with pytest.raises(AccessError):
         channels.channels_listall('faweeba' + user1['token'])
-    with pytest.raises(AccessError) as e:
+    with pytest.raises(AccessError):
         channels.channels_create('faweeba' + user1['token'], 'Public nuisance', True)
 
 
