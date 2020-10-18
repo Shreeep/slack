@@ -21,7 +21,7 @@ def channels_list(token):
 
     #Search through each channel in data
     for channel in data.data['channels']:
-        #Keep track of the current channel id and channel name 
+        #Keep track of the current channel id and channel name
         #If we find that the user is apart of a particular channel - append it to our user_channels list
         channel_details = {
             'channel_id': channel['id'],
@@ -33,7 +33,7 @@ def channels_list(token):
             if user_info == user_search: 
                 user_channels['channels'].append(channel_details)
 
-    return user_channels 
+    return user_channels
     
 
 
@@ -65,14 +65,14 @@ def channels_create(token, name, is_public):
     if not token in data.data['tokens']:
         raise AccessError
     #Check if name is more than 20 characters long and raise InputError
-    if len(name) > 20: 
+    if len(name) > 20:
         raise InputError
     #Use token to get owner's u_id, name_first, and name_last
     channel_owner_user_id = data.data['tokens'][token]
     channel_owner_name_first = data.data['users'][channel_owner_user_id]['name_first']
     channel_owner_name_last = data.data['users'][channel_owner_user_id]['name_last']
 
-    #Initialisation of new channel with its name and is_public bool 
+    #Initialisation of new channel with its name and is_public bool
     new_channel = {
         'id': 1,
         'name': name,
@@ -82,7 +82,7 @@ def channels_create(token, name, is_public):
         'messages': [], #Empty for Iteration 1
     }
 
-    #Setting the owner's detail 
+    #Setting the owner's detail
     owner_details = {
         'u_id': channel_owner_user_id,
         'name_first': channel_owner_name_first,

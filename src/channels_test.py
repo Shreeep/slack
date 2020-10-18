@@ -1,12 +1,12 @@
 import channels
 import channel
 import auth
-import pytest 
+import pytest
 from error import AccessError, InputError
 import data
 import other
 
-#Testing if {user, token} is apart of channel - it should return the asscoiated channel 
+#Testing if {user, token} is apart of channel - it should return the asscoiated channel
 def test_channels_list():
     user1 = auth.auth_register('poo@gmail.com', 'yep123', 'John', 'Smith')
     test_channel_one = channels.channels_create(user1['token'], 'Public Channel', True)
