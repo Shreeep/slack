@@ -55,7 +55,6 @@ def message_remove(token, message_id):
                 raise AccessError
     return {}
     
-
 def message_edit(token, message_id, message):
 
     if message is None:
@@ -65,11 +64,11 @@ def message_edit(token, message_id, message):
     user_id = data.data['tokens'][token]
     for channel in data.data['channels']:
         for messages in channel['messages']:
-            if message_id == messages['message_id'] and user_id == messages['u_id']: 
+            if message_id == messages['message_id'] and user_id == messages['u_id']:
                 messages['message'] = message
             elif check_if_user_is_owner(channel['id'], user_id) is True:
                 messages['message'] = message
-            else: #If neither of the above statements are True, the user is not authorised to edit the message
+            else: #User is not authorised to edit the message
                 raise AccessError
     return {}
 
@@ -85,13 +84,12 @@ def check_if_valid_channel_and_member(channel_id, u_id):
             return
     raise InputError
 
-#Very similar to above function - however checks if a message exists in data 
+#Very similar to above function - however checks if a message exists in data
 def check_if_message_exists(message_id): 
     for channel in data.data['channels']: 
-        for message in channel['messages']:
-            if not any(message['message_id'] == message_id for message in channel['messages']):
-                raise InputError
-            return
+        if not any(message['message_id'] == message_id for message in channel['messages']):
+            raise InputError
+        return
     raise InputError
 
 def check_if_user_is_owner(channel_id, user_id):
