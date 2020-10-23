@@ -1,6 +1,5 @@
 import requests
 import json
-# from echo_http_test import url
 import pytest
 import re
 import signal
@@ -33,6 +32,8 @@ def url():
 
 
 def test_post_register(url):
+ 
+    # user info
     dataIn = {
         'email': 'test@email.com',
         'password': 'password123',
@@ -40,68 +41,224 @@ def test_post_register(url):
         'name_last': 'user'
     }
 
+    # register user
     r = requests.post(url + "/auth/register", json=dataIn)
-
     encoded_jwt = r.json()
 
-    decoded_jwt = jwt.decode(encoded_jwt['token'], "secret string", algorithm='HS256')
-
-    r = requests.get(url + "/user/profile", json=decoded_jwt)
+    # checking for valid token
+    r = requests.get(url + "/users/all", params={'token': encoded_jwt['token']})
     result = r.json()
 
-    assert result['email'] == dataIn['email']
-    assert result['name_first'] == dataIn['name_first']
-    assert result['name_last'] == dataIn['name_last']
+    user = result['users'][0]
+
+    assert user['email'] == dataIn['email']
+    assert user['name_first'] == dataIn['name_first']
+    assert user['name_last'] == dataIn['name_last']
 
 
+def test_post_logout(url):
 
-# def test_post_login(url):
-#     dataIn = {
-#         'email': 'test@email.com',
-#         'password': 'password123',
+    # user info
+    dataIn = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
 
-#     }
+    # register and login user
+    r = requests.post(url + "/auth/register", json=dataIn)
+    encoded_jwt = r.json()
 
-#     r = requests.post(url + "/auth/login", json=dataIn)
-#     user_token = r.json()
-#     r = requests.get(url + "/user/profile", json=user_token)
-#     result = r.json()
+    # log out with token
+    r = requests.post(url + "/auth/logout", json=encoded_jwt)
+    result = r.json()
+
+    # successfully logged out
+    assert result['is_success'] == True
+
+
+def test_post_login(url):
+   
+    # user info
+    dataIn = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+
+    # register user
+    r = requests.post(url + "/auth/register", json=dataIn)
+    encoded_jwt = r.json()
+
+    # log out with token
+    r = requests.post(url + "/auth/logout", json=encoded_jwt)
+
+    # user login info
+    login_data = {
+        'email': 'test@email.com',
+        'password': 'password123',
+
+    }
+
+    # logging in
+    r = requests.post(url + "/auth/login", json=login_data)
+    encoded_jwt = r.json()
+
+    # checking correct user
+    r = requests.get(url + "/users/all", params={'token': encoded_jwt['token']})
+    result = r.json()
+
+    user = result['users'][0]
     
-#     assert result['email'] == dataIn['email']
-#     assert result['name_first'] == dataIn['name_first']
-#     assert result['name_last'] == dataIn['name_last']
+    assert user['email'] == dataIn['email']
+    assert user['name_first'] == dataIn['name_first']
+    assert user['name_last'] == dataIn['name_last']
+
+def test_post_register_multiple(url):
+    
+    # user info
+    dataIn = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+
+    # register user
+    r = requests.post(url + "/auth/register", json=dataIn)
+    encoded_jwt = r.json()
+
+    dataIn2 = {
+        'email': 'test2@email.com',
+        'password': 'password123456',
+        'name_first': 'New',
+        'name_last': 'User'
+    }
+
+    # register user
+    r2 = requests.post(url + "/auth/register", json=dataIn2)
+    encoded_jwt2 = r.json()
+
+    # checking for valid token (user 1)
+    r = requests.get(url + "/users/all", params={'token': encoded_jwt['token']})
+    result = r.json()
+
+    user = result['users'][0]
+
+    assert user['email'] == dataIn['email']
+    assert user['name_first'] == dataIn['name_first']
+    assert user['name_last'] == dataIn['name_last']
+
+    # checking for valid token (user 2)
+    r2 = requests.get(url + "/users/all", params={'token': encoded_jwt2['token']})
+    result = r.json()
+
+    user = result['users'][1]
+
+    assert user['email'] == dataIn2['email']
+    assert user['name_first'] == dataIn2['name_first']
+    assert user['name_last'] == dataIn2['name_last']
+
+def test_post_logout_multiple(url):
+
+    # user info
+    dataIn = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+
+    # register and login user
+    r = requests.post(url + "/auth/register", json=dataIn)
+    encoded_jwt = r.json()
 
 
-# def test_post_logout(url):
+    dataIn2 = {
+        'email': 'test2@email.com',
+        'password': 'password123456',
+        'name_first': 'New',
+        'name_last': 'User'
+    }
 
-#     '''
-#     Register user
-#     Logout user
-#     login with (expired) token
-#     fail
-#     '''
-#     dataIn = {
-#         'email': 'test@email.com',
-#         'password': 'password123',
-#         'name_first': 'test',
-#         'name_last': 'user'
-#     }
+    # register user 2
+    r2 = requests.post(url + "/auth/register", json=dataIn2)
+    encoded_jwt2 = r.json()
 
-#     # register and login user
-#     r = requests.post(url + "/auth/register", json=dataIn)
+    # log out with token (user 1)
+    r = requests.post(url + "/auth/logout", json=encoded_jwt)
+    result = r.json()
 
-#     # return my u_id and token
-#     user_token = r.json()
+    # successfully logged out
+    assert result['is_success'] == True
 
-#     # log out with token
-#     r = requests.post(url + "/auth/logout", json=user_token)
+    r2 = requests.post(url + "/auth/logout", json=encoded_jwt2)
+    result2 = r.json()
 
-#     # successfully logged out
-#     result = r.json()
+    assert result2['is_success'] == True
 
-#     assert result['is_success'] == True
+def test_post_login_multiple(url):
+   
+    # user info
+    dataIn = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
 
-#     # trying to log back in with previous token
-#     # r = requests.get(url + "/user/profile", json=user_token)
-#     # invalid = r.json()
+    # register user 1
+    r = requests.post(url + "/auth/register", json=dataIn)
+    encoded_jwt = r.json()
 
+    dataIn2 = {
+        'email': 'test2@email.com',
+        'password': 'password123456',
+        'name_first': 'New',
+        'name_last': 'User'
+    }
+
+    # register user 2
+    r2 = requests.post(url + "/auth/register", json=dataIn2)
+    encoded_jwt2 = r.json()
+
+    # log out with token
+    r = requests.post(url + "/auth/logout", json=encoded_jwt)
+    r2 = requests.post(url + "/auth/logout", json=encoded_jwt2)
+
+    # user login info
+    login_data = {
+        'email': 'test@email.com',
+        'password': 'password123',
+
+    }
+
+    # logging in
+    r = requests.post(url + "/auth/login", json=login_data)
+    encoded_jwt = r.json()
+
+    # checking correct user
+    r = requests.get(url + "/users/all", params={'token': encoded_jwt['token']})
+    result = r.json()
+
+    user = result['users'][0]
+    
+    assert user['email'] == dataIn['email']
+    assert user['name_first'] == dataIn['name_first']
+    assert user['name_last'] == dataIn['name_last']
+
+    login_data2 = {
+        'email': 'test2@email.com',
+        'password': 'password123456',
+
+    }
+
+    # logging in
+    r2 = requests.post(url + "/auth/login", json=login_data2)
+    encoded_jwt = r.json()
+
+    # checking correct user
+    r2 = requests.get(url + "/users/all", params={'token': encoded_jwt2['token']})
+    result = r.json()

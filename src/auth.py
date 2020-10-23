@@ -77,6 +77,7 @@ def auth_register(email, password, name_first, name_last):
 
     # saving new user info into a new dict
     new_user = {
+        'u_id': data.user_id,
         'email': email,
         'password': password,
         'name_first': name_first,

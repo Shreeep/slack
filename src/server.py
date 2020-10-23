@@ -4,6 +4,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from error import InputError
 import auth
+import other
 import hashlib
 import jwt
 import data
@@ -41,16 +42,16 @@ def register():
     # get the info
     user_info = request.get_json()
 
+    # hash user password and register
     password = hashlib.sha256(user_info['password'].encode()).hexdigest()
-    user_token = auth.auth_register(user_info['email'], password, user_info['name_first'], user_info['name_last'])
+    user = auth.auth_register(user_info['email'], password, user_info['name_first'], user_info['name_last'])
 
-    # print(f"AUTH REGISTER: {user_token}")
-
-    encoded_jwt = jwt.encode(user_token, data.jwt_secret, algorithm='HS256')
+    # encoding jwt
+    encoded_jwt = jwt.encode({'token': user['token']}, data.jwt_secret, algorithm='HS256')
 
     result = {
         'token': encoded_jwt.decode(),
-        'u_id': user_token['u_id']
+        'u_id': user['u_id']
     }
 
     return result
@@ -62,15 +63,16 @@ def login():
     # get user info
     user_info = request.get_json()
     
-    # login
+    # hash user password and login
     password = hashlib.sha256(user_info['password'].encode()).hexdigest()
-    user_token = auth.auth_login(user_info['email'], password)
+    user = auth.auth_login(user_info['email'], password)
 
-    encoded_jwt = jwt.encode(user_token, data.jwt_secret, algorithm='HS256')
+    # encoding jwt
+    encoded_jwt = jwt.encode({'token': user['token']}, data.jwt_secret, algorithm='HS256')
 
     result = {
         'token': encoded_jwt.decode(),
-        'u_id': user_token['u_id']
+        'u_id': user['u_id']
     }
 
     return result
@@ -78,20 +80,31 @@ def login():
 
 @APP.route("/auth/logout", methods=['POST'])
 def logout():
-    # check generated token?
-    # decode generated token
-    # check if decoded token matches DB?
 
     # get user info
     user_info = request.get_json()
 
-    print(f"IN the logout function: {user_info}")
-
+    # decode hashed jwt
     decoded_jwt = jwt.decode(user_info['token'], data.jwt_secret, algorithm='HS256')
 
-    isSuccess = auth.auth_logout(decoded_jwt['token'])
+    # logging out with token
+    is_success = auth.auth_logout(decoded_jwt['token'])
 
-    return isSuccess
+    return is_success
+
+@APP.route("/users/all", methods=['GET'])
+def users_all():
+
+    # gets user info
+    token = request.args['token']
+
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
+
+    all_users = other.users_all(decoded_jwt['token'])
+
+    return {'users': all_users}
+    
+
 
 if __name__ == "__main__":
     # APP.run(port=0) # Do not edit this port
