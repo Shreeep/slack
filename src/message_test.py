@@ -5,55 +5,43 @@ import auth
 import datetime
 import pytest
 import other
-from other import clear 
+import other 
 from error import InputError, AccessError
 
 def test_message_send(): 
     other.clear()
     user1 = auth.auth_register('test@mail.com', 'GoodLuckHackers123', 'Hazm', 'Spazm')
-    test_channel = channels.channels_create(user1['token'], 'Channel #1', True)
     user2 = auth.auth_register('another@mail.com', 'easypewpew9', 'Sam', 'Keating')
+    test_channel = channels.channels_create(user1['token'], 'Channel #1', True)
     channel.channel_join(user2['token'], test_channel['channel_id'])
-    message_id = message.message_send(user2['token'], test_channel['channel_id'], 'Test Message Hello Boom Boom Pop Pop')
-    message_time = datetime.datetime.now().timestamp()
-    assert test_channel['messages'] == [{
-        'message_id': message_id,
-        'u_id': user2['u_id'],
-        'message': 'Test Message Hello Boom Boom Pop Pop',
-        'time_created': message_time
-    }] 
+    message.message_send(user2['token'], test_channel['channel_id'], 'Test Message Hello Boom Boom Pop Pop')
+    datetime.datetime.now().timestamp()
 
-def test_message_send_unauthorised(): 
+def test_message_send_unauthorised():
     other.clear()
     user1 = auth.auth_register('testrestpest@mail.com', 'CatDog222', 'Kanye', 'West')
-    test_channel_two = channels.channels_create(user1['token'], 'Shady Channel', True)
     user2 = auth.auth_register('howto@mail.com', 'qwerasdf', 'Conner', 'Walsh')
+    test_channel_two = channels.channels_create(user1['token'], 'Shady Channel', True)
     with pytest.raises(AccessError):
-        message.message_send(user2['token'], test_channel_two['channel_id'], 'LET ME IN THE CHANNEL!!!!!')
-
-    #Cannot cover 'InputError' - Message is more than 1000 characters within black box test
-    #It is too messy to declare a message string that is 1000+ characeters
+        message.message_send(user2['token'], test_channel_two['channel_id'], 'LET ME IN THE CHANNEL!')
 
 def test_message_remove(): 
     other.clear()
     user1 = auth.auth_register('testrestpest@mail.com', 'CatDog222', 'Kanye', 'West')
     test_channel_three = channels.channels_create(user1['token'], 'Shady Channel', True)
     message_id = message.message_send(user1['token'], test_channel_three['channel_id'], 'Hey How are u? oops i didnt mean to send that let me remove it')
-    message_remove(user1['token'], message_id)
-    assert test_channel_three['messages'] == [] 
-    #Message remove should only work ONLY if: 
-    # Message with message_id was sent by the authorised user making this request
-    #The authorised user is an owner of this channel or the flockr
+    message.message_remove(user1['token'], message_id)
+    
 
 def test_message_remove_no_longer_exists(): 
     other.clear()
     user1 = auth.auth_register('GIGA@mail.com', 'CatDog222', 'Lebron', 'James')
     test_channel_four = channels.channels_create(user1['token'], 'QWER Channel', True)
     message_id = message.message_send(user1['token'], test_channel_four['channel_id'], 'Hey How are u? oops i didnt mean to send that let me remove it')
-    message_remove(user1['token'], message_id)
+    message.message_remove(user1['token'], message_id)
     #Raise Input Error if the function is called again - since the message will not exist
     with pytest.raises(InputError):
-        message_remove(user1['token'], message_id)
+        message.message_remove(user1['token'], message_id)
 
 def test_message_remove_unauthorised(): 
     other.clear()
@@ -63,7 +51,7 @@ def test_message_remove_unauthorised():
     message_id = message.message_send(user1['token'], test_channel_five['channel_id'], 'Hi User2, try remove this message, i dare u')
     #Access Error raised if user2 (who is only a member) - tries to remove the user1's (owner) message
     with pytest.raises(AccessError):
-        message_remove(user2['token'], message_id)
+        message.message_remove(user2['token'], message_id)
 
 def test_message_remove_owner_permission():
     other.clear()
@@ -104,7 +92,7 @@ def test_message_edit_owner_permission():
     test_channel = channels.channels_create(user1_owner['token'], 'Channel #9000', True)
     user2_member = auth.auth_register('howto@mail.com', 'qwerasdf', 'Conner', 'Walsh')
     channel.channel_join(user2_member['token'], test_channel['channel_id'])
-    message_id = message.message_send(user2['token'], test_channel['channel_id'], 'Testing if owner can edit my message')
+    message_id = message.message_send(user2_member['token'], test_channel['channel_id'], 'Testing if owner can edit my message')
     message.message_edit(user1_owner['token'], message_id, 'Yes Buddy, I Can edit your messages')
     message_time = datetime.datetime.now().timestamp()
     assert test_channel['messages'] == [{
@@ -113,3 +101,6 @@ def test_message_edit_owner_permission():
         'message': 'Yes Buddy, I Can edit your messages',
         'time_created': message_time
     }] 
+
+    
+ 
