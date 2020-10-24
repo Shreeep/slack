@@ -2,17 +2,11 @@ import re
 import data
 from error import InputError, AccessError
 
-email_regex = r'^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-
-max_handle_len = 20
-max_name_len = 50
-min_name_len = 1
-min_pw_len = 6
 
 def auth_login(email, password):
 
     # Checking if valid email
-    if not re.search(email_regex,email):
+    if not re.search(data.EMAIL_REGEX,email):
         raise InputError
 
     # Checking for correct input
@@ -57,17 +51,17 @@ def auth_logout(token):
 def auth_register(email, password, name_first, name_last):
 
     # Checking if valid email
-    if not re.search(email_regex,email):
+    if not re.search(data.EMAIL_REGEX,email):
         raise InputError
 
     # Generating user handle and limiting to 20 chars
     handle = name_first.lower() + name_last.lower()
-    handle = handle[:max_handle_len]
+    handle = handle[:data.MAX_HANDLE_LEN]
     
     # if the handle has been used
     if handle in data.data['handles']:
         # limiting handle to handle length - user_id_length, then adding user_id to the end
-        handle = handle[:max_handle_len - len(str(data.user_id))] + str(data.user_id)
+        handle = handle[:data.MAX_HANDLE_LEN - len(str(data.user_id))] + str(data.user_id)
 
     # Checking if the dictionary is empty
     # make the first registered user in the dictionary global owner
@@ -77,6 +71,7 @@ def auth_register(email, password, name_first, name_last):
 
     # saving new user info into a new dict
     new_user = {
+        'u_id': data.user_id,
         'email': email,
         'password': password,
         'name_first': name_first,
@@ -91,15 +86,15 @@ def auth_register(email, password, name_first, name_last):
             raise InputError
 
     # Checking whether the password is valid
-    if len(new_user['password']) < min_pw_len:
+    if len(new_user['password']) < data.MIN_PW_LEN:
         raise InputError
 
     # first name is between 1 - 50
-    if len(name_first) < min_name_len or len(name_first) > max_name_len: 
+    if len(name_first) < data.MIN_NAME_LEN or len(name_first) > data.MAX_NAME_LEN: 
         raise InputError
 
     # last name is between 1 - 50
-    if len(name_last) < min_name_len or len(name_last) > max_name_len:
+    if len(name_last) < data.MIN_NAME_LEN or len(name_last) > data.MAX_NAME_LEN:
         raise InputError
 
     # adding new user info to global data dict
