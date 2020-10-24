@@ -2,10 +2,6 @@ from error import InputError, AccessError
 import data
 import datetime
 
-#Assumptions:
-    # message_id's are only unique in the scope of their respective channels
-    # time that the pytest will execute the test function and the actual function will differ
-
 def message_send(token, channel_id, message):
     #Check if message length is not more than 1000.
     if len(message) > 1000:
@@ -57,7 +53,7 @@ def message_remove(token, message_id):
     
 def message_edit(token, message_id, message):
 
-    if message is None:
+    if message is None or message is '':
         message_remove(token, message_id)
         return {}
 
@@ -82,7 +78,6 @@ def check_if_valid_channel_and_member(channel_id, u_id):
             if not any(member['u_id'] == u_id for member in channel['members']):
                 raise AccessError
             return
-    raise InputError
 
 #Very similar to above function - however checks if a message exists in data
 def check_if_message_exists(message_id): 
@@ -90,7 +85,6 @@ def check_if_message_exists(message_id):
         if not any(message['message_id'] == message_id for message in channel['messages']):
             raise InputError
         return
-    raise InputError
 
 def check_if_user_is_owner(channel_id, user_id):
     for channel in data.data['channels']:
