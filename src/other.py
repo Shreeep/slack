@@ -36,14 +36,3 @@ def search(token, query_str):
             }
         ],
     }
-
-# import auth
-# import json
-# auth.auth_register('test@email.com', 'password', 'test', 'user')
-# auth.auth_register('test1@email.com', 'password', 'test', 'user')
-# auth.auth_register('test2@email.com', 'password', 'test', 'user')
-# auth.auth_register('test3@email.com', 'password', 'test', 'user')
-# auth.auth_register('test4@email.com', 'password', 'test', 'user')
-# # print(users_all('token1'))
-# for u in users_all('token1'):
-#     print (u)
