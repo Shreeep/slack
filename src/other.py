@@ -6,6 +6,8 @@ def clear():
     data.data['handles'] = {}
     data.data['tokens'] = {}
     data.data['channels'] = []
+    data.data['messages'] = []
+    data.message_id = 1
     data.token_id = 1
     data.user_id = 1
 
