@@ -126,8 +126,7 @@ def test_post_register_multiple(url):
     }
 
     # register user 1
-    r = requests.post(url + "/auth/register", json=dataIn)
-    encoded_jwt = r.json()
+    requests.post(url + "/auth/register", json=dataIn)
 
     dataIn2 = {
         'email': 'test2@email.com',
@@ -307,7 +306,6 @@ def test_post_login_errors(url):
 
     # log out with token
     r = requests.post(url + "/auth/logout", json=encoded_jwt)
-    result = r.json()
 
     # user login info
     login_data = {

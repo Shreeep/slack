@@ -6,9 +6,9 @@ from error import InputError, AccessError
 
 def test_user_profile():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
     register2 = auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
-    register3 = auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
+    auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
     result = user.user_profile(register2['token'], register2['u_id'])
     assert result == {
         'u_id': register2['u_id'],
@@ -21,9 +21,9 @@ def test_user_profile():
 
 def test_user_profile_errors():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
-    register2 = auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
-    register3 = auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
+    auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
 
     # invalid u_id
     with pytest.raises(InputError):
@@ -40,9 +40,9 @@ def test_user_profile_errors():
 
 def test_user_profile_setname():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
     register2 = auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
-    register3 = auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
+    auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
     user.user_profile_setname(register2['token'], 'New', 'UUSSSEEERRR')
     user_profile = user.user_profile(register2['token'], register2['u_id'])
 
@@ -57,9 +57,9 @@ def test_user_profile_setname():
 
 def test_user_profile_setname_errors():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
-    register2 = auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
-    register3 = auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
+    auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
 
     # invalid first name length < 1
     with pytest.raises(InputError):
@@ -80,9 +80,9 @@ def test_user_profile_setname_errors():
 
 def test_user_profile_setemail():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
     register2 = auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
-    register3 = auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
+    auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
     user.user_profile_setemail(register2['token'], 'anewemail@email.com')
     user_profile = user.user_profile(register2['token'], register2['u_id'])
 
@@ -97,9 +97,9 @@ def test_user_profile_setemail():
 
 def test_user_profile_setemail_errors():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
-    register2 = auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
-    register3 = auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
+    auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
 
     # no @ symbol
     with pytest.raises(InputError):
@@ -137,9 +137,9 @@ def test_user_profile_setemail_used():
 
 def test_user_profile_sethandle():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
     register2 = auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
-    register3 = auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
+    auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
     user.user_profile_sethandle(register2['token'], 'thisisanewhandle')
     user_profile = user.user_profile(register2['token'], register2['u_id'])
 
@@ -154,9 +154,9 @@ def test_user_profile_sethandle():
 
 def test_user_profile_sethandle_errors():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
-    register2 = auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
-    register3 = auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_register('test1@email.com', 'password', 'test1', 'user1')
+    auth.auth_register('test2@email.com', 'password', 'test2', 'user2')
 
     # invalid handle change < 3 
     with pytest.raises(InputError):
