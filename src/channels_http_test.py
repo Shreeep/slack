@@ -1,5 +1,6 @@
 import pytest
 import re
+from error import AccessError, InputError
 from subprocess import Popen, PIPE
 import signal
 from time import sleep
@@ -54,13 +55,12 @@ def test_get_channels_list(url):
         'name': 'Public Channel #2',
         'is_public': True
     }
-    create_channel_two = requests.post(url + "/channels/create", json=test_channel_two_details)
-    payload_channel_two = create_channel_two.json()
+    requests.post(url + "/channels/create", json=test_channel_two_details)
 
     # Get request the channel list for user 1
     channel_list_user1 = requests.get(url + "/channels/list", params={'token':payload_user1['token']})
     result = channel_list_user1.json()
-    pythonic_result = {
+    assert result == {
         'channels':[
             {
                 'channel_id': payload_channel_one['channel_id'],
@@ -68,7 +68,6 @@ def test_get_channels_list(url):
             },
         ]
     }
-    assert result == pythonic_result.json()
 
 def test_get_channels_list_empty(url):
 
@@ -83,13 +82,13 @@ def test_get_channels_list_empty(url):
     register_user1 = requests.post(url + "/auth/register", json=user1)
     payload_user1 = register_user1.json()
 
-    # 
+    # Get list of channels associated with user1
     channel_list_user1 = requests.get(url + "/channels/list", params={'token':payload_user1['token']})
     result = channel_list_user1.json()
-    pythonic_result = {
+    
+    assert result == {
         'channels':[]
     }
-    assert result == pythonic_result.json()
 
 
 def test_get_channels_listall(url):
@@ -137,22 +136,21 @@ def test_get_channels_listall(url):
     all_channels_list = requests.get(url + "/channels/listall", params={'token':payload_user1['token']})
     result = all_channels_list.json()
 
-    pythonic_result = {
+    assert result == {
         'channels':[
             {
-                'channel_id': test_channel_two['channel_id'],
+                'channel_id': payload_channel_one['id'],
                 'name': 'User 1s Channel',
             },
 
             {
-                'channel_id': test_channel_three['channel_id'],
+                'channel_id': payload_channel_two['id'],
                 'name': 'User 2s Channel',
             }
         ]
     }
-    assert result == pythonic_result.json()
 
-def test_get_channels_list_and_listall_invalid_user(): 
+def test_get_channels_list_and_listall_invalid_user(url): 
     # User info:
     user1 = {
         'email': 'test@email.com',
@@ -171,14 +169,67 @@ def test_get_channels_list_and_listall_invalid_user():
         'name': 'Public Channel #1',
         'is_public': True
     }
+    requests.post(url + "/channels/create", json=test_channel_one_details)
+    # If an invalid token requests a list or listall (that normally contains test_channel_one details)
+    # Raise Access Error
+    with pytest.raises(AccessError):
+        requests.get(url + "/channels/list", params={'token': 'invalid' + payload_user1['token']})
+    with pytest.raises(AccessError): 
+        requests.get(url + "/channels/listall", params={'token': 'invalid' + payload_user1['token']})
+
+def test_post_channels_create_private(url): 
+
+    # User info:
+    user1 = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+    # Register user:
+    register_user1 = requests.post(url + "/auth/register", json=user1)
+    payload_user1 = register_user1.json()
+
+    #Create channel associated with user:
+    test_channel_one_details = {
+        'token': payload_user1['token'],
+        'name': 'Public Channel #1',
+        'is_public': False
+    }
     create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
     payload_channel_one = create_channel_one.json()
-    # If an invalid token requests a list or listall (that normally contains test_channel_one details)
-    # Raise Access Error 
+
+    # 2nd User info:
+    user2 = {
+        'email': 'qwerqwer@email.com',
+        'password': 'password123',
+        'name_first': 'johnn',
+        'name_last': 'smith'
+    }
+    # Register user:
+    register_user2 = requests.post(url + "/auth/register", json=user2)
+    payload_user2 = register_user2.json()
+
     with pytest.raises(AccessError):
-        channel_list_user1 = requests.get(url + "/channels/list", params={'token': 'invalid' + payload_user1['token']})
-    with pytest.raises(AccessError): 
-        channel_list_user1 = requests.get(url + "/channels/listall", params={'token': 'invalid' + payload_user1['token']})
+        requests.post(url + "/channel/join", data={'token':payload_user2['token'], 'channel_id': payload_channel_one['id']})
 
-def test_post_channels_create(url): 
+def test_post_channel_create_name_too_long(url): 
+    # User info:
+    user1 = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+    # Register user:
+    register_user1 = requests.post(url + "/auth/register", json=user1)
+    payload_user1 = register_user1.json()
 
+    #Create channel associated with user:
+    test_channel_one_details = {
+        'token': payload_user1['token'],
+        'name': '123456789101213141516171819',
+        'is_public': False
+    }
+    with pytest.raises(InputError): 
+        requests.post(url + "/channels/create", json=test_channel_one_details)
