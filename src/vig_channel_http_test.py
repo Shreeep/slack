@@ -180,7 +180,7 @@ def test_get_messages(url):
     }
     r = requests.get(url + "/channel/messages", params=data_in)
     messagesss = r.json()
-    assert messagesss == 'werules'
+    assert messagesss['messages'][0]['message'] == 'werules'
 
 def test_post_invite_errors(url):
 
