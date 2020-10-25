@@ -51,28 +51,34 @@ def test_post_channel_leave(url):
 
     #create channel
     create_channel_one = requests.post(url + "/channels/create", json=channel1)
-    encoded_channel_one = create_channel_one.json()
+    channel_one = create_channel_one.json()
 
+    #assert that user1 is part of channel1
+    user_list = requests.get(url + "/channels/list", params={'token':encoded_jwt_user1['token']})
+    user1_channels = user_list.json()
 
     assert user1_channels['channels'] == [
         {
-            'channel_id' : 1
-            'name' : CrazyFrogsNewChannel
+            'channel_id' : 1,
+            'name' : "CrazyFrogsNewChannel"
         }
     ]
+
+#PROBLEM CODE
     #leave channel inputs
     u1_leave_ch1_data = {
         'token' : encoded_jwt_user1['token'],
-        'channel_id' : encoded_channel_one['channel_id']
+        'channel_id' : channel_one['channel_id']
     }
     #user 1 leaves channel 1
-    requests.post(url + "channel/leave", json=u1_leave_ch1_data)
-    
+    requests.post(url + "/channel/leave", json=u1_leave_ch1_data)
+#PROBLEM CODE
+
     #assert that user1 is no longer part of channel1 (or any channels)
-    user_list = requests.get(url + "channels/list", params={'token':encoded_jwt_user1['token']})
+    user_list = requests.get(url + "/channels/list", params={'token':encoded_jwt_user1['token']})
     user1_channels = user_list.json()
 
-    assert user1_channels['channels'] == []
+    assert user1_channels == {'channels' : []}
 
 
 def test_post_channel_join(url):
@@ -125,12 +131,13 @@ def test_post_channel_join(url):
     user_list_2 = requests.get(url + "channels/list", params={'token':encoded_jwt_user2['token']})
     user2_channels = user_list_2.json()
 
-    assert user2_channels['channels'] == [
+    assert user2_channels == {'channels' : [
         {
             'channel_id': encoded_channel_1['channel_id'],
             'name' : 'CrazyFrogsNewChannel'
         }
-    ]
+    ]}
+  
 
 def test_post_channel_addowner(url):
     user1 = {
@@ -181,12 +188,12 @@ def test_post_channel_addowner(url):
     user_list_2 = requests.get(url + "channels/list", params={'token':encoded_jwt_user2['token']})
     user2_channels = user_list_2.json()
     
-    assert user2_channels['channels'] == [
+    assert user2_channels == {'channels' : [
         {
             'channel_id': encoded_channel_1['channel_id'],
             'name' : 'CrazyFrogsNewChannel'
         }
-    ]
+    ]}
 
 def test_post_channel_removeowner(url):
     user1 = {
@@ -239,7 +246,7 @@ def test_post_channel_removeowner(url):
     user_list_2 = requests.get(url + "channels/list", params={'token':encoded_jwt_user2['token']})
     user2_channels = user_list_2.json()
     
-    assert user2_channels['channels'] == []
+    assert user2_channels == {'channels' : []}
 
 
 
