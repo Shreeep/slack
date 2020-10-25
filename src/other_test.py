@@ -46,9 +46,10 @@ def test_admin_userpermission_change():
 def test_search():
     other.clear()
     user1 = auth.auth_register('user13@gmail.com', '123abc!@#', 'Hayden', 'Everest')
-    user2 = auth.auth_register('user23@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
+    auth.auth_register('user23@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
     public_channel_id = channels.channels_create(user1['token'], "channel16", 1)
     for i in range(60):
         message.message_send(user1['token'], public_channel_id['channel_id'], 'testing123')
+        public_channel_id['channel_id'] = public_channel_id['channel_id'] + i - i
     other.search(user1['token'], 'testing123')
     other.search(user1['token'], 'testin5234')

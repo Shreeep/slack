@@ -69,9 +69,9 @@ def test_channel_details_success_two_users():
     user1 = auth.auth_register('user14@gmail.com', '123abc!@#', 'Hayden', 'Everest')
     user2 = auth.auth_register('user24@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
     # creating channel with user 1 and inviting user 2
-    public_channel_id = channels.channels_create(user1['token'],"channel14",1)
+    channels.channels_create(user1['token'],"channel14",1)
     public_channel_id2 = channels.channels_create(user1['token'],"channel15",1)
-    public_channel_id3 = channels.channels_create(user1['token'],"channel16",1)
+    channels.channels_create(user1['token'],"channel16",1)
     channel.channel_invite(user1['token'],public_channel_id2['channel_id'],user2['u_id'])
     # checking for correct output
     assert channel.channel_details(user1['token'],public_channel_id2['channel_id']) == {
@@ -179,6 +179,7 @@ def test_channel_messages_success_25_msgs():
     channel.channel_invite(user1['token'],public_channel_id['channel_id'],user2['u_id'])
     for i in range(25):
         message.message_send(user1['token'],public_channel_id['channel_id'],'testing123')
+        public_channel_id['channel_id'] = public_channel_id['channel_id'] + i - i
     result = channel.channel_messages(user1['token'],public_channel_id['channel_id'],0)
     assert result['start'] == 0
     assert result['end'] == -1
@@ -191,6 +192,7 @@ def test_channel_messages_success_50_msgs():
     channel.channel_invite(user1['token'], public_channel_id['channel_id'], user2['u_id'])
     for i in range(60):
         message.message_send(user1['token'], public_channel_id['channel_id'], 'testing123')
+        public_channel_id['channel_id'] = public_channel_id['channel_id'] + i - i
     result = channel.channel_messages(user1['token'], public_channel_id['channel_id'], 5)
     assert result['start'] == 5
     assert result['end'] == 55

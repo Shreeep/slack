@@ -208,8 +208,8 @@ def test_delete_message_remove_unauthorised(url):
     message_payload = send_message.json()
 
     #User2 (who is not apart of the channel) trys to remove the message - AccessError
-    r1 = requests.delete(url + "/message/remove", json={'token':payload_user2['token'], 'message_id':message_payload['message_id']})
-    assert r1.status_code == 400
+    r_1 = requests.delete(url + "/message/remove", json={'token':payload_user2['token'], 'message_id':message_payload['message_id']})
+    assert r_1.status_code == 400
 
 def test_delete_message_remove_owner_permission(url):
     # User Info:
@@ -254,8 +254,8 @@ def test_delete_message_remove_owner_permission(url):
     send_message = requests.post(url + "/message/send", json=message_one)
     message_payload = send_message.json()
     #User 1 Requesting to remove User 2's message since User 1 is the Owner - he should be allowed to do this 
-    r1 = requests.delete(url + "/message/remove", json={'token':payload_user1['token'], 'message_id':message_payload['message_id']})
-    assert r1.status_code == 200
+    r_1 = requests.delete(url + "/message/remove", json={'token':payload_user1['token'], 'message_id':message_payload['message_id']})
+    assert r_1.status_code == 200
 
 def test_put_message_edit_unauthorised(url):
     # User Info:
@@ -296,10 +296,9 @@ def test_put_message_edit_unauthorised(url):
     }
     send_message = requests.post(url + "/message/send", json=message_one)
     message_payload = send_message.json()
-
     #User2 (who is not apart of the channel) trys to edit the message - AccessError
-    r1 = requests.put(url + "/message/edit", json={'token':payload_user2['token'], 'message_id':message_payload['message_id'], 'message': 'blah blah poo poo bing'})
-    assert r1.status_code == 400
+    r_1 = requests.put(url + "/message/edit", json={'token':payload_user2['token'], 'message_id':message_payload['message_id'], 'message':'asdasd message ahha'})
+    assert r_1.status_code == 400
 
 def test_put_message_edit_owner_permission(url):
     # User Info:
@@ -344,8 +343,8 @@ def test_put_message_edit_owner_permission(url):
     send_message = requests.post(url + "/message/send", json=message_one)
     message_payload = send_message.json()
     #User 1 Requesting to edit User 2's message since User 1 is the Owner - he should be allowed to do this 
-    r1 = requests.put(url + "/message/edit", json={'token':payload_user1['token'], 'message_id':message_payload['message_id'], 'message':'asdasd message ahha'})
-    assert r1.status_code == 200
+    r_1 = requests.put(url + "/message/edit", json={'token':payload_user1['token'], 'message_id':message_payload['message_id'], 'message':'asdasd message ahha'})
+    assert r_1.status_code == 200
 
 def test_put_message_edit_user_permission(url):
     # User Info:
@@ -389,9 +388,9 @@ def test_put_message_edit_user_permission(url):
     }
     send_message = requests.post(url + "/message/send", json=message_one)
     message_payload = send_message.json()
-    #User 2 Requesting to edit their own message - should be allowed 
-    r1 = requests.put(url + "/message/edit", json={'token':payload_user2['token'], 'message_id':message_payload['message_id'], 'message':'Edited message'})
-    assert r1.status_code == 200
+    #User 2 Requesting to edit their own message - should be allowed
+    r_1 = requests.put(url + "/message/edit", json={'token':payload_user2['token'], 'message_id':message_payload['message_id'], 'message':'Edited message'})
+    assert r_1.status_code == 200
     
 def test_put_message_edit_empty(url):
     user1 = {
@@ -420,8 +419,8 @@ def test_put_message_edit_empty(url):
     }
     result = requests.post(url + "/message/send", json=message_one)
     result_payload = result.json()
-    r1 = requests.put(url + "/message/edit", json={'token': payload_user1['token'], 'message_id': result_payload['message_id'], 'message': ''})
-    assert r1.status_code == 200
+    r_1 = requests.put(url + "/message/edit", json={'token': payload_user1['token'], 'message_id': result_payload['message_id'], 'message': ''})
+    assert r_1.status_code == 200
     
 
 
