@@ -197,13 +197,8 @@ def create():
     #Get channel info from front-end 
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
-<<<<<<< HEAD
     channel_id = channels.channels_create(decoded_jwt['token'], info['name'], info['is_public'])
     return dumps(channel_id)
-=======
-    channel = channels.channels_create(decoded_jwt['token'], info['name'], info['is_public'])
-    return dumps(channel)
->>>>>>> origin/test_http_message_hasm
 
 @APP.route("/message/send", methods=['POST'])
 def send_message():
@@ -226,7 +221,6 @@ def edit_message():
     message.message_edit(decoded_jwt['token'], info['message_id'], info['message'])
     return dumps({})
 
-<<<<<<< HEAD
 @APP.route("/user/profile", methods=['GET'])
 def profile():
     token = request.args['token']
@@ -277,8 +271,6 @@ def clear():
     other.clear()
     return dumps({})
 
-=======
->>>>>>> origin/test_http_message_hasm
 if __name__ == "__main__":
     # APP.run(port=0) # Do not edit this port
     APP.run(port=0) # Do not edit this port
