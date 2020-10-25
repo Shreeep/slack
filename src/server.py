@@ -5,6 +5,7 @@ from flask_cors import CORS
 from error import InputError
 import auth
 import channels
+import channel
 import message
 import other
 import hashlib
@@ -150,7 +151,6 @@ def edit_message():
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
     message.message_edit(decoded_jwt['token'], info['message_id'], info['message'])
     return {}
-
 
 if __name__ == "__main__":
     #APP.run(port=0) # Do not edit this port
