@@ -1,3 +1,4 @@
+'''
 import channels
 import json
 from echo_http_test import url 
@@ -28,7 +29,7 @@ def list():
     token = request.args['token']
     decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
     user_channels = channels.channels_list(decoded_jwt['token'])
-    return {'channels':user_channels}
+    return json.dumps(user_channels)
 
 
 
@@ -37,20 +38,20 @@ def listall():
     token = request.args['token']
     decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
     all_channels = channels.channels_listall(decoded_jwt['token'])
-    return {'channels':all_channels}
+    return json.dumps(all_channels)
 
 
 @APP.route("/channels/create", methods=['POST'])
 def create():
-    #Get user info from front-end 
+    #Get channel info from front-end 
     info = request.get_json()
-    channel = channels.channels_create(info['token'], info['name'], info['is_public'])
-    result = {
-        'channel_id': channel['channel_id']
-    }
-    return result 
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    return json.dumps(channels.channels_create(decoded_jwt['token'], info['name'], info['is_public']))
+
 
 
 if __name__ == "__main__":
-    APP.run(port=5000) # Do not edit this port
+    APP.run(port=0) # Do not edit this port
    #APP.run(port=1337) # Do not edit this port
+
+'''

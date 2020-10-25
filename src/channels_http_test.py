@@ -232,7 +232,7 @@ def test_post_channels_create_private(url):
     # Register user:
     register_user2 = requests.post(url + "/auth/register", json=user2)
     payload_user2 = register_user2.json()
-    unauth_payload =requests.post(url + "/channel/join", data={'token':payload_user2['token'], 'channel_id': payload_channel_one['channel_id']})
+    unauth_payload = requests.post(url + "/channel/join", data={'token':payload_user2['token'], 'channel_id': payload_channel_one['channel_id']})
     assert unauth_payload.status_code == 400
 
 def test_post_channel_create_name_too_long(url): 

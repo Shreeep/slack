@@ -128,20 +128,14 @@ def create():
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
     channel = channels.channels_create(decoded_jwt['token'], info['name'], info['is_public'])
-    result = {
-        'channel_id': channel['channel_id']
-    }
-    return dumps(result)
+    return dumps(channel)
 
 @APP.route("/message/send", methods=['POST'])
 def send_message():
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
-    message = message.message_send(decoded_jwt['token'], info['channel_id'],  info['message'])
-    result = {
-        'message_id': message['message_id']
-    }
-    return dumps(result)
+    user_message = message.message_send(decoded_jwt['token'], info['channel_id'],  info['message'])
+    return dumps(user_message)
 
 @APP.route("/message/remove", methods=['DELETE'])
 def remove_message():
