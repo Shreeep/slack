@@ -55,19 +55,20 @@ def test_get_channels_list(url):
         'name': 'Public Channel #2',
         'is_public': True
     }
-    payload_channel_two = requests.post(url + "/channels/create", json=test_channel_two_details)
-
+    create_channel_two = requests.post(url + "/channels/create", json=test_channel_two_details)
+    payload_channel_two = create_channel_two.json()
+    
     # Get request the channel list for user 1
     channel_list_user1 = requests.get(url + "/channels/list", params={'token':payload_user1['token']})
     result = channel_list_user1.json()
     assert result == {
         'channels':[
             {
-                'channel_id': payload_channel_one['id'],
+                'channel_id': payload_channel_one['channel_id'],
                 'name': 'Public Channel #1',
             },
             {
-                'channel_id': payload_channel_two['id'],
+                'channel_id': payload_channel_two['channel_id'],
                 'name': 'Public Channel #2',
             },
         ]
@@ -182,14 +183,22 @@ def test_get_channels_list_and_listall_invalid_user(url):
     }
     register_user2 = requests.post(url + "/auth/register", json=user2)
     payload_user2 = register_user2.json()
-    
-    requests.post(url + "/channels/create", json=test_channel_one_details)
+
+    create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
+    payload_channel_one = create_channel_one.json()
     # If an invalid token requests a list or listall (that normally contains test_channel_one details)
     # Raise Access Error
     r1 = requests.get(url + "/channels/list", params={'token': payload_user2['token']})
+    r1_payload = r1.json()
     r2 = requests.get(url + "/channels/listall", params={'token': payload_user2['token']})
-    assert r1.status_code == 400
-    assert r2.status_code == 200
+    r2_payload = r2.json()
+    assert r1_payload['channels'] == []
+    assert r2_payload['channels'] ==  [
+        {
+            'channel_id': payload_channel_one['channel_id'],
+            'name': 'Public Channel #1'
+        }
+    ]
 
 def test_post_channels_create_private(url): 
 
