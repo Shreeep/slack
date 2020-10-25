@@ -6,6 +6,7 @@ from error import InputError
 import auth
 import channel
 import channels
+import message
 import other
 import hashlib
 import jwt
@@ -131,7 +132,7 @@ def messages():
     # get the info
     token = request.args.get('token')
     channel_id = request.args.get('channel_id', default = 1, type = int)
-    start = request.args.get('start')
+    start = request.args.get('start', default = 0, type = int)
     decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
 
     result = channel.channel_messages(decoded_jwt['token'], channel_id['channel_id'], start)
@@ -160,10 +161,29 @@ def create():
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
     channel_id = channels.channels_create(decoded_jwt['token'], info['name'], info['is_public'])
-    result = {
-        'channel_id': channel['channel_id']
-    }
-    return dumps(result)
+    return dumps(channel_id)
+
+@APP.route("/message/send", methods=['POST'])
+def send_message():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    user_message = message.message_send(decoded_jwt['token'], info['channel_id'],  info['message'])
+    return dumps(user_message)
+
+@APP.route("/message/remove", methods=['DELETE'])
+def remove_message():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    message.message_remove(decoded_jwt['token'], info['message_id'])
+    return {}
+
+@APP.route("/message/edit", methods=['PUT'])
+def edit_message():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    message.message_edit(decoded_jwt['token'], info['message_id'], info['message'])
+    return {}
+
 
 if __name__ == "__main__":
     # APP.run(port=0) # Do not edit this port
