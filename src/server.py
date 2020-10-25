@@ -9,6 +9,7 @@ import other
 import hashlib
 import jwt
 import data
+import channel
 
 def defaultHandler(err):
     response = err.get_response()
@@ -105,6 +106,40 @@ def users_all():
 
     return {'users': all_users}
     
+@APP.route("/channel/leave", methods=['POST'])
+def leave():
+    # get user info
+    leave_data = request.get_json()  
+    decoded_jwt = jwt.decode(leave_data['token'], data.jwt_secret, algorithm='HS256')
+    result = channel.channel_leave(decoded_jwt['token'], leave_data['channel_id'])
+
+    return dumps(result)
+
+@APP.route("/channel/join", methods=['POST'])
+def join():
+    # get user info
+    join_data = request.get_json()  
+    decoded_jwt = jwt.decode(join_data['token'], data.jwt_secret, algorithm='HS256')
+    result = channel.channel_join(decoded_jwt['token'], join_data['channel_id'])
+
+    return dumps(result)
+
+@APP.route("/channel/addowner", methods=['POST'])
+def addowner():
+    # get user info
+    add_data = request.get_json()
+    decoded_jwt = jwt.decode(add_data['token'], data.jwt_secret, algorithm='HS256')
+    result = channel.channel_addowner(decoded_jwt['token'], add_data['channel_id'], add_data['u_id'])
+    return dumps(result)
+
+@APP.route("/channel/removeowner", methods=['POST'])
+def removeowner():
+    # get user info
+    remove_data = request.get_json()
+    decoded_jwt = jwt.decode(remove_data['token'], data.jwt_secret, algorithm='HS256')
+    result = channel.channel_removeowner(decoded_jwt['token'], remove_data['channel_id'], remove_data['u_id'])
+    return dumps(result)
+
 @APP.route("/channels/list", methods=['GET'])
 def list():
     token = request.args['token']
