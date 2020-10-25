@@ -91,8 +91,7 @@ def user_profile_sethandle(token, handle_str):
     profile['handle_str'] = handle_str
     data.data['handles'][handle_str] = True
 
-    return {
-    }   
+    return {}   
 
 
 
