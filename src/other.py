@@ -51,16 +51,20 @@ def admin_userpermission_change(token, u_id, permission_id):
     return {}
 
 def search(token, query_str):
+    # checking for valid token
     if token not in data.data['tokens']:
         raise AccessError
+    
+    u_id = data.data['tokens'][token]
+    messages = []
+
+    # checking for query string in user's channels
+    for channel in data.data['channels']:
+        if any(member['u_id'] == u_id for member in channel['members']):
+            for message in channel['messages']:
+                if (message['message'] == query_str):
+                    messages.append(message)
 
     return {
-        'messages': [
-            {
-                'message_id': 1,
-                'u_id': 1,
-                'message': 'Hello world',
-                'time_created': 1582426789,
-            }
-        ],
+        'messages': messages
     }

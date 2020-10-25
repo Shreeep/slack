@@ -18,6 +18,7 @@ def channels_list(token):
         'name_first': data.data['users'][user_id]['name_first'],
         'name_last': data.data['users'][user_id]['name_last'],
     }
+    
 
     #Search through each channel in data
     for channel in data.data['channels']:
