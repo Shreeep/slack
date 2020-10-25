@@ -4,6 +4,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from error import InputError
 import auth
+import channels
 import other
 import hashlib
 import jwt
@@ -104,8 +105,33 @@ def users_all():
 
     return {'users': all_users}
     
+@APP.route("/channels/list", methods=['GET'])
+def list():
+    token = request.args['token']
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
+    user_channels = channels.channels_list(decoded_jwt['token'])
+    return dumps(user_channels)
 
+
+@APP.route("/channels/listall", methods=['GET'])
+def listall():
+    token = request.args['token']
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
+    all_channels = channels.channels_listall(decoded_jwt['token'])
+    return dumps(all_channels)
+
+
+@APP.route("/channels/create", methods=['POST'])
+def create():
+    #Get channel info from front-end 
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    channel = channels.channels_create(decoded_jwt['token'], info['name'], info['is_public'])
+    result = {
+        'channel_id': channel['channel_id']
+    }
+    return dumps(result)
 
 if __name__ == "__main__":
-    # APP.run(port=0) # Do not edit this port
+    #APP.run(port=0) # Do not edit this port
     APP.run(port=1337) # Do not edit this port

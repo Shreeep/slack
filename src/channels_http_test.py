@@ -55,7 +55,7 @@ def test_get_channels_list(url):
         'name': 'Public Channel #2',
         'is_public': True
     }
-    requests.post(url + "/channels/create", json=test_channel_two_details)
+    payload_channel_two = requests.post(url + "/channels/create", json=test_channel_two_details)
 
     # Get request the channel list for user 1
     channel_list_user1 = requests.get(url + "/channels/list", params={'token':payload_user1['token']})
@@ -63,8 +63,12 @@ def test_get_channels_list(url):
     assert result == {
         'channels':[
             {
-                'channel_id': payload_channel_one['channel_id'],
+                'channel_id': payload_channel_one['id'],
                 'name': 'Public Channel #1',
+            },
+            {
+                'channel_id': payload_channel_two['id'],
+                'name': 'Public Channel #2',
             },
         ]
     }
@@ -139,12 +143,12 @@ def test_get_channels_listall(url):
     assert result == {
         'channels':[
             {
-                'channel_id': payload_channel_one['id'],
+                'channel_id': payload_channel_one['channel_id'],
                 'name': 'User 1s Channel',
             },
 
             {
-                'channel_id': payload_channel_two['id'],
+                'channel_id': payload_channel_two['channel_id'],
                 'name': 'User 2s Channel',
             }
         ]
@@ -169,13 +173,23 @@ def test_get_channels_list_and_listall_invalid_user(url):
         'name': 'Public Channel #1',
         'is_public': True
     }
+    # Unauthorised user: 
+    user2 = {
+        'email': 'qwer@email.com',
+        'password': 'passworqwerd123',
+        'name_first': 'jims',
+        'name_last': 'mowing'
+    }
+    register_user2 = requests.post(url + "/auth/register", json=user2)
+    payload_user2 = register_user2.json()
+    
     requests.post(url + "/channels/create", json=test_channel_one_details)
     # If an invalid token requests a list or listall (that normally contains test_channel_one details)
     # Raise Access Error
-    with pytest.raises(AccessError):
-        requests.get(url + "/channels/list", params={'token': 'invalid' + payload_user1['token']})
-    with pytest.raises(AccessError): 
-        requests.get(url + "/channels/listall", params={'token': 'invalid' + payload_user1['token']})
+    r1 = requests.get(url + "/channels/list", params={'token': payload_user2['token']})
+    r2 = requests.get(url + "/channels/listall", params={'token': payload_user2['token']})
+    assert r1.status_code == 400
+    assert r2.status_code == 200
 
 def test_post_channels_create_private(url): 
 
@@ -209,9 +223,8 @@ def test_post_channels_create_private(url):
     # Register user:
     register_user2 = requests.post(url + "/auth/register", json=user2)
     payload_user2 = register_user2.json()
-
-    with pytest.raises(AccessError):
-        requests.post(url + "/channel/join", data={'token':payload_user2['token'], 'channel_id': payload_channel_one['id']})
+    unauth_payload =requests.post(url + "/channel/join", data={'token':payload_user2['token'], 'channel_id': payload_channel_one['channel_id']})
+    assert unauth_payload.status_code == 400
 
 def test_post_channel_create_name_too_long(url): 
     # User info:
@@ -231,5 +244,5 @@ def test_post_channel_create_name_too_long(url):
         'name': '123456789101213141516171819',
         'is_public': False
     }
-    with pytest.raises(InputError): 
-        requests.post(url + "/channels/create", json=test_channel_one_details)
+    r = requests.post(url + "/channels/create", json=test_channel_one_details)
+    assert r.status_code == 400
