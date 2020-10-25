@@ -4,6 +4,7 @@ from flask import Flask, request
 from flask_cors import CORS
 from error import InputError
 import auth
+import channel
 import other
 import hashlib
 import jwt
@@ -54,7 +55,7 @@ def register():
         'u_id': user['u_id']
     }
 
-    return result
+    return dumps(result)
     
 
 @APP.route("/auth/login", methods=['POST'])
@@ -75,7 +76,7 @@ def login():
         'u_id': user['u_id']
     }
 
-    return result
+    return dumps(result)
 
 
 @APP.route("/auth/logout", methods=['POST'])
@@ -90,7 +91,7 @@ def logout():
     # logging out with token
     is_success = auth.auth_logout(decoded_jwt['token'])
 
-    return is_success
+    return dumps(is_success)
 
 @APP.route("/users/all", methods=['GET'])
 def users_all():
@@ -102,10 +103,39 @@ def users_all():
 
     all_users = other.users_all(decoded_jwt['token'])
 
-    return {'users': all_users}
-    
+    return dumps({'users': all_users})
 
+@APP.route("/channel/invite", methods=['POST'])
+def invite():
+    # get the info
+    inv_data = request.get_json()
+
+    result = channel.channel_invite(inv_data['token'], inv_data['channel_id'], inv_data['u_id'])
+
+    return dumps(result)
+
+@APP.route("/channel/details", methods=['GET'])
+def details():
+    # get the info
+    token = request.args['token']
+    channel_id = request.args['channel_id']
+
+    result = channel.channel_details(token, channel_id)
+
+    return dumps(result)
+
+@APP.route("/channel/messages", methods=['GET'])
+def messages():
+    # get the info
+    token = request.args['token']
+    channel_id = request.args['channel_id']
+    start = request.args['start']
+
+    result = channel.channel_messages(token, channel_id, start)
+
+    return dumps(result)
 
 if __name__ == "__main__":
     # APP.run(port=0) # Do not edit this port
-    APP.run(port=1337) # Do not edit this port
+    APP.run(port=0) # Do not edit this port
+
