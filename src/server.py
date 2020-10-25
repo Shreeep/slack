@@ -126,7 +126,7 @@ def create():
     #Get channel info from front-end 
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
-    channel = channels.channels_create(decoded_jwt['token'], info['name'], info['is_public'])
+    channel_id = channels.channels_create(decoded_jwt['token'], info['name'], info['is_public'])
     result = {
         'channel_id': channel['channel_id']
     }
