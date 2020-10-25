@@ -5,11 +5,13 @@ from flask_cors import CORS
 from error import InputError
 import auth
 import channels
+import channel
+import message
 import other
 import hashlib
 import jwt
 import data
-import channel
+
 
 def defaultHandler(err):
     response = err.get_response()
@@ -162,10 +164,28 @@ def create():
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
     channel_id = channels.channels_create(decoded_jwt['token'], info['name'], info['is_public'])
-    result = {
-        'channel_id': channel['channel_id']
-    }
-    return dumps(result)
+    return dumps(channel_id)
+
+@APP.route("/message/send", methods=['POST'])
+def send_message():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    user_message = message.message_send(decoded_jwt['token'], info['channel_id'],  info['message'])
+    return dumps(user_message)
+
+@APP.route("/message/remove", methods=['DELETE'])
+def remove_message():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    message.message_remove(decoded_jwt['token'], info['message_id'])
+    return {}
+
+@APP.route("/message/edit", methods=['PUT'])
+def edit_message():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    message.message_edit(decoded_jwt['token'], info['message_id'], info['message'])
+    return {}
 
 if __name__ == "__main__":
     #APP.run(port=0) # Do not edit this port

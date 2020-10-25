@@ -1,11 +1,10 @@
+import json
 import pytest
 import re
-from error import AccessError, InputError
 from subprocess import Popen, PIPE
 import signal
 from time import sleep
 import requests
-import json
 
 @pytest.fixture
 def url():
@@ -200,7 +199,7 @@ def test_get_channels_list_and_listall_invalid_user(url):
         }
     ]
 
-def test_post_channels_create_private(url): 
+def test_post_channels_create(url): 
 
     # User info:
     user1 = {
@@ -221,19 +220,10 @@ def test_post_channels_create_private(url):
     }
     create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
     payload_channel_one = create_channel_one.json()
-
-    # 2nd User info:
-    user2 = {
-        'email': 'qwerqwer@email.com',
-        'password': 'password123',
-        'name_first': 'johnn',
-        'name_last': 'smith'
+    assert payload_channel_one == {
+        'channel_id': payload_channel_one['channel_id']
     }
-    # Register user:
-    register_user2 = requests.post(url + "/auth/register", json=user2)
-    payload_user2 = register_user2.json()
-    unauth_payload =requests.post(url + "/channel/join", data={'token':payload_user2['token'], 'channel_id': payload_channel_one['channel_id']})
-    assert unauth_payload.status_code == 400
+    
 
 def test_post_channel_create_name_too_long(url): 
     # User info:
