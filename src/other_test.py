@@ -9,4 +9,6 @@ def test_all_access_errors():
     with pytest.raises(AccessError):
         other.users_all('token2')
     with pytest.raises(AccessError):
-        other.users_all('token2')
+        other.admin_userpermission_change('token2', 1, 1)
+    with pytest.raises(AccessError):
+        other.search('token2', 'example')
