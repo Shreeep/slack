@@ -18,6 +18,7 @@ def channels_list(token):
         'name_first': data.data['users'][user_id]['name_first'],
         'name_last': data.data['users'][user_id]['name_last'],
     }
+    
 
     #Search through each channel in data
     for channel in data.data['channels']:
@@ -96,8 +97,7 @@ def channels_create(token, name, is_public):
     while any(channel['id'] == new_channel['id'] for channel in data.data['channels']):
         new_channel['id'] += 1
     data.data['channels'].append(new_channel)
-    channel_id = new_channel['id']
-        
+    channel_id = new_channel['id'] 
     return {
         'channel_id': channel_id,
     } 
