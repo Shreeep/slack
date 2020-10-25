@@ -17,14 +17,20 @@ def test_channel_invite_success():
     user3 = auth.auth_register('userwabi@gmail.com', '123abc!@#', 'Richard', 'Dawkins')
     # creating channel with user 1
     public_channel_id = channels.channels_create(user1['token'],"channel12",1)
+    public_channel_id2 = channels.channels_create(user1['token'],"channel123",1)
     # checking if user 2 can invite user 3 yet
     # should fail as user 2 is not in the channel
     with pytest.raises(AccessError):
         channel.channel_invite(user2['token'],public_channel_id['channel_id'],user3['u_id'])
     # inviting user 2 to channel
     channel.channel_invite(user1['token'],public_channel_id['channel_id'],user2['u_id'])
+    channel.channel_invite(user1['token'],public_channel_id['channel_id'],user2['u_id'])
     # user 2 can now add user 3 to channel
     channel.channel_invite(user2['token'],public_channel_id['channel_id'],user3['u_id'])
+    # inviting user 2 to channel
+    channel.channel_invite(user1['token'],public_channel_id2['channel_id'],user2['u_id'])
+    # user 2 can now add user 3 to channel
+    channel.channel_invite(user2['token'],public_channel_id2['channel_id'],user3['u_id'])
 
 def test_channel_invite_failure_wrong_inputs():
     # clearing data
@@ -64,10 +70,12 @@ def test_channel_details_success_two_users():
     user2 = auth.auth_register('user24@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
     # creating channel with user 1 and inviting user 2
     public_channel_id = channels.channels_create(user1['token'],"channel14",1)
-    channel.channel_invite(user1['token'],public_channel_id['channel_id'],user2['u_id'])
+    public_channel_id2 = channels.channels_create(user1['token'],"channel15",1)
+    public_channel_id3 = channels.channels_create(user1['token'],"channel16",1)
+    channel.channel_invite(user1['token'],public_channel_id2['channel_id'],user2['u_id'])
     # checking for correct output
-    assert channel.channel_details(user1['token'],public_channel_id['channel_id']) == {
-        'name': 'channel14',
+    assert channel.channel_details(user1['token'],public_channel_id2['channel_id']) == {
+        'name': 'channel15',
         'owner_members': [
             {
                 'u_id': user1['u_id'],
@@ -123,6 +131,8 @@ def test_channel_messages_failure_no_msgs():
     user1 = auth.auth_register('user16@gmail.com', '123abc!@#', 'Hayden', 'Everest')
     # user1 creates a channel
     public_channel_id = channels.channels_create(user1['token'],"channel16",1)
+    public_channel_id = channels.channels_create(user1['token'],"channel15",1)
+    public_channel_id = channels.channels_create(user1['token'],"channel14",1)
     # error as start index is 0 but messages is empty as no msgs sent
     with pytest.raises(InputError):
         assert channel.channel_messages(user1['token'],public_channel_id['channel_id'],0)
