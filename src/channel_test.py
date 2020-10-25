@@ -4,6 +4,7 @@ import channels
 import pytest
 import data
 import other
+import message
 from error import InputError, AccessError
 from datetime import datetime
 
@@ -160,101 +161,29 @@ def test_channel_messages_failure_access_errors():
 
 # tests for when message_send() is implemented
 
-# def test_channel_messages_success_25_msgs():
-#     other.clear()
-#     user1 = auth.auth_register('user16@gmail.com', '123abc!@#', 'Hayden', 'Everest')
-#     user2 = auth.auth_register('user26@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
-#     public_channel_id = channels.channels_create(user1['token'],"channel16",1)
-#     channel.channel_invite(user1['token'],public_channel_id['channel_id'],user2['u_id'])
-#     messages = []
-#     for i in range(25):
-#         message.message_send(user1['token'],public_channel_id['channel_id'],'testing123')
-#         messages.append({
-#             'message_id': i + 1,
-#             'u_id': user1['u_id'],
-#             'message': 'testing123',
-#             'time_created': datetime.now(),
-#         })
-#     assert channel.channel_messages(user1['token'],public_channel_id['channel_id'],0) == {
-#         'messages': messages,
-#         'start': 0,
-#         'end': -1,
-#     }
+def test_channel_messages_success_25_msgs():
+    other.clear()
+    user1 = auth.auth_register('user16@gmail.com', '123abc!@#', 'Hayden', 'Everest')
+    user2 = auth.auth_register('user26@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
+    public_channel_id = channels.channels_create(user1['token'],"channel16",1)
+    channel.channel_invite(user1['token'],public_channel_id['channel_id'],user2['u_id'])
+    for i in range(25):
+        message.message_send(user1['token'],public_channel_id['channel_id'],'testing123')
+    result = channel.channel_messages(user1['token'],public_channel_id['channel_id'],0)
+    assert result['start'] == 0
+    assert result['end'] == -1
 
-# def test_channel_messages_success_50_msgs():
-#     other.clear()
-#     user1 = auth.auth_register('user16@gmail.com', '123abc!@#', 'Hayden', 'Everest')
-#     user2 = auth.auth_register('user26@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
-#     public_channel_id = channels.channels_create(user1['token'],"channel16",1)
-#     channel.channel_invite(user1['token'],public_channel_id['channel_id'],user2['u_id'])
-#     messages = []
-#     for i in range(50):
-#         message.message_send(user1['token'],public_channel_id['channel_id'],'testing123')
-#         messages.append({
-#             'message_id': i + 1,
-#             'u_id': user1['u_id'],
-#             'message': 'testing123',
-#             'time_created': datetime.now(),
-#         })
-#     assert channel.channel_messages(user1['token'],public_channel_id['channel_id'],0) == {
-#         'messages': messages,
-#         'start': 0,
-#         'end': 50,
-#     }
-
-# ===========================================================================================
-
-# not black-box tests to check if channel_messages() is implemented correctly
-
-# def test_channel_messages_success_embedded_msgs():
-#     other.clear()
-#     user1 = auth.auth_register('user16@gmail.com', '123abc!@#', 'Hayden', 'Everest')
-#     user2 = auth.auth_register('user26@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
-#     public_channel_id = channels.channels_create(user1['token'],"channel16",1)
-#     for chan in data.data['channels']:
-#         if public_channel_id['channel_id'] == chan['id']:
-#             chan['messages'] = [
-#                     {
-#                     'message_id': 1,
-#                     'u_id': 1,
-#                     'message': 'Hello world',
-#                     'time_created': 1582426789,
-#                     },
-#                     {
-#                     'message_id': 2,
-#                     'u_id': 1,
-#                     'message': 'Hello world1',
-#                     'time_created': 1582426790,
-#                     },
-#                 ]
-#             result = chan['messages']
-#     assert channel.channel_messages(user1['token'],public_channel_id['channel_id'],0) == {
-#         'messages': result,
-#         'start': 0,
-#         'end': -1,
-#     }
-
-# def test_channel_messages_success_50_embedded_msgs():
-#     other.clear()
-#     user1 = auth.auth_register('user16@gmail.com', '123abc!@#', 'Hayden', 'Everest')
-#     user2 = auth.auth_register('user26@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
-#     public_channel_id = channels.channels_create(user1['token'],"channel16",1)
-#     result = []
-#     for chan in data.data['channels']:
-#         if public_channel_id['channel_id'] == chan['id']:
-#             for i in range(50):
-#                 result.append({
-#                     'message_id': i + 1,
-#                     'u_id': user1['u_id'],
-#                     'message': 'testing123',
-#                     'time_created': datetime.now(),
-#                 })
-#             chan['messages'] = result
-#     assert channel.channel_messages(user1['token'],public_channel_id['channel_id'],0) == {
-#         'messages': result,
-#         'start': 0,
-#         'end': 50,
-#     }
+def test_channel_messages_success_50_msgs():
+    other.clear()
+    user1 = auth.auth_register('user16@gmail.com', '123abc!@#', 'Hayden', 'Everest')
+    user2 = auth.auth_register('user26@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
+    public_channel_id = channels.channels_create(user1['token'], "channel16", 1)
+    channel.channel_invite(user1['token'], public_channel_id['channel_id'], user2['u_id'])
+    for i in range(60):
+        message.message_send(user1['token'], public_channel_id['channel_id'], 'testing123')
+    result = channel.channel_messages(user1['token'], public_channel_id['channel_id'], 5)
+    assert result['start'] == 5
+    assert result['end'] == 55
 
 #tests for channel_leave
 

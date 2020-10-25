@@ -5,6 +5,7 @@ from flask_cors import CORS
 from error import InputError
 import auth
 import channel
+import channels
 import other
 import hashlib
 import jwt
@@ -30,11 +31,11 @@ APP.register_error_handler(Exception, defaultHandler)
 # Example
 @APP.route("/echo", methods=['GET'])
 def echo():
-    data = request.args.get('data')
-    if data == 'echo':
+    data_out = request.args.get('data')
+    if data_out == 'echo':
         raise InputError(description='Cannot echo "echo"')
     return dumps({
-        'data': data
+        'data': data_out
     })
 
 
@@ -109,31 +110,42 @@ def users_all():
 def invite():
     # get the info
     inv_data = request.get_json()
-
-    result = channel.channel_invite(inv_data['token'], inv_data['channel_id'], inv_data['u_id'])
+    decoded_jwt = jwt.decode(inv_data['token'], data.jwt_secret, algorithm='HS256')
+    result = channel.channel_invite(decoded_jwt['token'], inv_data['channel_id'], inv_data['u_id'])
 
     return dumps(result)
 
 @APP.route("/channel/details", methods=['GET'])
 def details():
     # get the info
-    token = request.args['token']
-    channel_id = request.args['channel_id']
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id', default = 1, type = int)
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
 
-    result = channel.channel_details(token, channel_id)
+    result = channel.channel_details(decoded_jwt['token'], channel_id)
 
     return dumps(result)
 
 @APP.route("/channel/messages", methods=['GET'])
 def messages():
     # get the info
-    token = request.args['token']
-    channel_id = request.args['channel_id']
-    start = request.args['start']
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id', default = 1, type = int)
+    start = request.args.get('start')
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
 
-    result = channel.channel_messages(token, channel_id, start)
+    result = channel.channel_messages(decoded_jwt['token'], channel_id['channel_id'], start)
 
     return dumps(result)
+
+@APP.route("/channels/create", methods=['POST'])
+def create():
+    #Get channel info from front-end 
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    channel_id = channels.channels_create(decoded_jwt['token'], info['name'], info['is_public'])
+    return dumps(channel_id)
+
 
 if __name__ == "__main__":
     # APP.run(port=0) # Do not edit this port

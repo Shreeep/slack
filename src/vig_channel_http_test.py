@@ -4,6 +4,7 @@ import pytest
 import re
 import signal
 import jwt
+import data
 from subprocess import Popen, PIPE
 from time import sleep
 
@@ -67,7 +68,7 @@ def test_post_invite(url):
     channel_data = {
         'token': user_1['token'],
         'name': 'channel1',
-        'isPublic': 1,
+        'is_public': True,
     }
     r = requests.post(url + "/channels/create", json=channel_data)
     channel_id = r.json()
@@ -107,7 +108,7 @@ def test_get_details(url):
     channel_data = {
         'token': user_1['token'],
         'name': 'channel1',
-        'isPublic': 1,
+        'is_public': True,
     }
     r = requests.post(url + "/channels/create", json=channel_data)
     channel_id = r.json()
@@ -117,11 +118,12 @@ def test_get_details(url):
         'token': user_1['token'],
         'channel_id': channel_id['channel_id'],
     }
-    r = requests.post(url + "/channel/details", json=data_in)
+
+    r = requests.get(url + "/channel/details", params=data_in)
     channel_details = r.json()
-    
+
     assert channel_details == {
-        'name': 'channel14',
+        'name': 'channel1',
         'owner_members': [
             {
                 'u_id': user_1['u_id'],
@@ -157,7 +159,7 @@ def test_get_messages(url):
     channel_data = {
         'token': user_1['token'],
         'name': 'channel1',
-        'isPublic': 1,
+        'is_public': True,
     }
     r = requests.post(url + "/channels/create", json=channel_data)
     channel_id = r.json()
@@ -176,7 +178,7 @@ def test_get_messages(url):
         'channel_id': channel_id['channel_id'],
         'start': 0,
     }
-    r = requests.post(url + "/channel/messages", json=data_in)
+    r = requests.get(url + "/channel/messages", params=data_in)
     messagesss = r.json()
     assert messagesss['messages'][0]['message'] == 'werules'
 
@@ -218,7 +220,7 @@ def test_post_invite_errors(url):
     channel_data = {
         'token': user_1['token'],
         'name': 'channel1',
-        'isPublic': 1,
+        'is_public': True,
     }
     r = requests.post(url + "/channels/create", json=channel_data)
     channel_id = r.json()

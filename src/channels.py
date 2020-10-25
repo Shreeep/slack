@@ -96,8 +96,7 @@ def channels_create(token, name, is_public):
     while any(channel['id'] == new_channel['id'] for channel in data.data['channels']):
         new_channel['id'] += 1
     data.data['channels'].append(new_channel)
-    channel_id = new_channel['id']
-        
+    channel_id = new_channel['id'] 
     return {
         'channel_id': channel_id,
     } 
