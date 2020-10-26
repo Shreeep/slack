@@ -42,6 +42,8 @@ def test_admin_userpermission_change():
     user1 = auth.auth_register('user13@gmail.com', '123abc!@#', 'Hayden', 'Everest')
     user2 = auth.auth_register('user23@gmail.com', '123abc!@#', 'Bowen', 'Pierce')
     other.admin_userpermission_change(user1['token'], user2['u_id'], 1)
+    # should work as user2 is now global owner
+    assert other.admin_userpermission_change(user2['token'], user1['u_id'], 2) == {}
 
 def test_search():
     other.clear()
@@ -51,5 +53,5 @@ def test_search():
     for i in range(60):
         message.message_send(user1['token'], public_channel_id['channel_id'], 'testing123')
         public_channel_id['channel_id'] = public_channel_id['channel_id'] + i - i
-    other.search(user1['token'], 'testing123')
-    other.search(user1['token'], 'testin5234')
+    assert other.search(user1['token'], 'testing123') != {'messages': []} 
+    assert other.search(user1['token'], 'testin5234') == {'messages': []}
