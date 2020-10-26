@@ -6,13 +6,14 @@ from error import InputError
 import auth
 import channel
 import channels
+import channel
 import message
 import user
 import other
 import hashlib
 import jwt
 import data
-import channel
+
 
 def defaultHandler(err):
     response = err.get_response()

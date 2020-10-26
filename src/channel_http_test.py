@@ -247,6 +247,3 @@ def test_post_channel_removeowner(url):
     user2_channels = user_list_2.json()
     
     assert user2_channels == {'channels' : []}
-
-
-
