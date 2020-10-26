@@ -27,7 +27,7 @@ def message_send(token, channel_id, message):
     #Append the new_message to data
     for channel in data.data['channels']:
         if channel_id == channel['id']:
-            channel['messages'].append(new_message)
+            channel['messages'].insert(0, new_message)
 
     return {
         'message_id': message_id,

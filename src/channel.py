@@ -51,7 +51,7 @@ def channel_details(token, channel_id):
 def channel_messages(token, channel_id, start):
     # check for valid token
     if not token in data.data['tokens']:
-        raise AccessError
+        raise AccessError(description='wrong token')
     # find user in token dictionary
     u_id = data.data['tokens'][token]
     # check if valid channel and user is member
@@ -66,7 +66,8 @@ def channel_messages(token, channel_id, start):
     result = []
     # raise error if start index is outside range of messages
     if start >= len(messages):
-        raise InputError
+        if start != 0:
+            raise InputError(description='start error')
     # copy messages until reached 50 or end of messages list
     index = start
     for i in range(50):
@@ -256,7 +257,7 @@ def check_if_valid_channel_and_member(channel_id, u_id):
         if channel['id'] == channel_id:
             # if u_id is not a member chuck an AccessError
             if not any(member['u_id'] == u_id for member in channel['members']):
-                raise AccessError
+                raise AccessError(description='not in channel')
             state = 1
     if (state == 0):
-        raise InputError
+        raise InputError(description='channel doesnt exist')
