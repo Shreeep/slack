@@ -13,7 +13,7 @@ import other
 import hashlib
 import jwt
 import data
-import channel
+
 
 def defaultHandler(err):
     response = err.get_response()
