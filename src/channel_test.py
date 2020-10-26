@@ -124,7 +124,7 @@ def test_channel_details_failure_access_erros():
         # invalid token
         channel.channel_details('faweebawoowaba' + user2['token'],public_channel_id['channel_id'])
 
-def test_channel_messages_failure_no_msgs():
+def test_channel_messages_failure_wrong_start_msgs():
     # clearing data
     other.clear()
     # registering a user
@@ -135,7 +135,7 @@ def test_channel_messages_failure_no_msgs():
     public_channel_id = channels.channels_create(user1['token'],"channel14",1)
     # error as start index is 0 but messages is empty as no msgs sent
     with pytest.raises(InputError):
-        assert channel.channel_messages(user1['token'],public_channel_id['channel_id'],0)
+        assert channel.channel_messages(user1['token'],public_channel_id['channel_id'],1)
 
 def test_channel_messages_failure_wrong_input():
     # clearing data
