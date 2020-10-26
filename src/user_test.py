@@ -76,6 +76,9 @@ def test_user_profile_setname_errors():
     # invalid first name length > 50
     with pytest.raises(InputError):
         user.user_profile_setname('token2', 'firstname', 'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz')
+    
+    with pytest.raises(AccessError):
+        user.user_profile_setname('nbidsovno', 'testuser', '')
 
 
 def test_user_profile_setemail():
@@ -124,6 +127,9 @@ def test_user_profile_setemail_errors():
     # empty input
     with pytest.raises(InputError):
         user.user_profile_setemail('token2', '')
+    
+    with pytest.raises(AccessError):
+        user.user_profile_setemail('nbidsovno', 'testuser')
 
 
 def test_user_profile_setemail_used():
@@ -169,3 +175,6 @@ def test_user_profile_sethandle_errors():
     # handle used by another user
     with pytest.raises(InputError):
         user.user_profile_sethandle('token2', 'testuser')
+
+    with pytest.raises(AccessError):
+        user.user_profile_sethandle('nbidsovno', 'testuser')

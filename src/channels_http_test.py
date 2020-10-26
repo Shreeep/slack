@@ -187,10 +187,10 @@ def test_get_channels_list_and_listall_invalid_user(url):
     payload_channel_one = create_channel_one.json()
     # If an invalid token requests a list or listall (that normally contains test_channel_one details)
     # Raise Access Error
-    r1 = requests.get(url + "/channels/list", params={'token': payload_user2['token']})
-    r1_payload = r1.json()
-    r2 = requests.get(url + "/channels/listall", params={'token': payload_user2['token']})
-    r2_payload = r2.json()
+    r_1 = requests.get(url + "/channels/list", params={'token': payload_user2['token']})
+    r1_payload = r_1.json()
+    r_2 = requests.get(url + "/channels/listall", params={'token': payload_user2['token']})
+    r2_payload = r_2.json()
     assert r1_payload['channels'] == []
     assert r2_payload['channels'] ==  [
         {

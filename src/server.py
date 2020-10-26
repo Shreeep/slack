@@ -4,9 +4,11 @@ from flask import Flask, request
 from flask_cors import CORS
 from error import InputError
 import auth
+import channel
 import channels
 import channel
 import message
+import user
 import other
 import hashlib
 import jwt
@@ -33,11 +35,11 @@ APP.register_error_handler(Exception, defaultHandler)
 # Example
 @APP.route("/echo", methods=['GET'])
 def echo():
-    data = request.args.get('data')
-    if data == 'echo':
+    data_out = request.args.get('data')
+    if data_out == 'echo':
         raise InputError(description='Cannot echo "echo"')
     return dumps({
-        'data': data
+        'data': data_out
     })
 
 
@@ -48,17 +50,17 @@ def register():
 
     # hash user password and register
     password = hashlib.sha256(user_info['password'].encode()).hexdigest()
-    user = auth.auth_register(user_info['email'], password, user_info['name_first'], user_info['name_last'])
+    user1 = auth.auth_register(user_info['email'], password, user_info['name_first'], user_info['name_last'])
 
     # encoding jwt
-    encoded_jwt = jwt.encode({'token': user['token']}, data.jwt_secret, algorithm='HS256')
+    encoded_jwt = jwt.encode({'token': user1['token']}, data.jwt_secret, algorithm='HS256')
 
     result = {
         'token': encoded_jwt.decode(),
-        'u_id': user['u_id']
+        'u_id': user1['u_id']
     }
 
-    return result
+    return dumps(result)
     
 
 @APP.route("/auth/login", methods=['POST'])
@@ -69,17 +71,17 @@ def login():
     
     # hash user password and login
     password = hashlib.sha256(user_info['password'].encode()).hexdigest()
-    user = auth.auth_login(user_info['email'], password)
+    user1 = auth.auth_login(user_info['email'], password)
 
     # encoding jwt
-    encoded_jwt = jwt.encode({'token': user['token']}, data.jwt_secret, algorithm='HS256')
+    encoded_jwt = jwt.encode({'token': user1['token']}, data.jwt_secret, algorithm='HS256')
 
     result = {
         'token': encoded_jwt.decode(),
-        'u_id': user['u_id']
+        'u_id': user1['u_id']
     }
 
-    return result
+    return dumps(result)
 
 
 @APP.route("/auth/logout", methods=['POST'])
@@ -94,7 +96,7 @@ def logout():
     # logging out with token
     is_success = auth.auth_logout(decoded_jwt['token'])
 
-    return is_success
+    return dumps(is_success)
 
 @APP.route("/users/all", methods=['GET'])
 def users_all():
@@ -106,7 +108,39 @@ def users_all():
 
     all_users = other.users_all(decoded_jwt['token'])
 
-    return {'users': all_users}
+    return dumps({'users': all_users})
+
+@APP.route("/channel/invite", methods=['POST'])
+def invite():
+    # get the info
+    inv_data = request.get_json()
+    decoded_jwt = jwt.decode(inv_data['token'], data.jwt_secret, algorithm='HS256')
+    result = channel.channel_invite(decoded_jwt['token'], inv_data['channel_id'], inv_data['u_id'])
+
+    return dumps(result)
+
+@APP.route("/channel/details", methods=['GET'])
+def details():
+    # get the info
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id', default = 1, type = int)
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
+
+    result = channel.channel_details(decoded_jwt['token'], channel_id)
+
+    return dumps(result)
+
+@APP.route("/channel/messages", methods=['GET'])
+def messages():
+    # get the info
+    token = request.args.get('token')
+    channel_id = request.args.get('channel_id', default = 1, type = int)
+    start = request.args.get('start', default = 0, type = int)
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
+
+    result = channel.channel_messages(decoded_jwt['token'], channel_id, start)
+
+    return dumps(result)
     
 @APP.route("/channel/leave", methods=['POST'])
 def leave():
@@ -143,7 +177,7 @@ def removeowner():
     return dumps(result)
 
 @APP.route("/channels/list", methods=['GET'])
-def list():
+def channel_list():
     token = request.args['token']
     decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
     user_channels = channels.channels_list(decoded_jwt['token'])
@@ -178,15 +212,66 @@ def remove_message():
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
     message.message_remove(decoded_jwt['token'], info['message_id'])
-    return {}
+    return dumps({})
 
 @APP.route("/message/edit", methods=['PUT'])
 def edit_message():
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
     message.message_edit(decoded_jwt['token'], info['message_id'], info['message'])
-    return {}
+    return dumps({})
+
+@APP.route("/user/profile", methods=['GET'])
+def profile():
+    token = request.args['token']
+    u_id = request.args.get('u_id', default = 0, type = int)
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
+    result = user.user_profile(decoded_jwt['token'], u_id)
+    return dumps(result)
+
+@APP.route("/user/profile/setname", methods=['PUT'])
+def set_name():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    user.user_profile_setname(decoded_jwt['token'], info['name_first'], info['name_last'])
+    return dumps({})
+
+@APP.route("/user/profile/setemail", methods=['PUT'])
+def set_email():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    user.user_profile_setemail(decoded_jwt['token'], info['email'])
+    return dumps({})
+
+@APP.route("/user/profile/sethandle", methods=['PUT'])
+def set_handle():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    user.user_profile_sethandle(decoded_jwt['token'], info['handle_str'])
+    return dumps({})
+
+@APP.route("/admin/userpermission/change", methods=['POST'])
+def change():
+    # get the info
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    other.admin_userpermission_change(decoded_jwt['token'], info['u_id'], info['permission_id'])
+    return dumps({})
+
+@APP.route("/search", methods=['GET'])
+def search():
+    token = request.args['token']
+    query_str = request.args['query_str']
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
+    result = other.search(decoded_jwt['token'], query_str)
+    return dumps(result)
+
+@APP.route("/clear", methods=['DELETE'])
+def clear():
+    other.clear()
+    return dumps({})
 
 if __name__ == "__main__":
-    #APP.run(port=0) # Do not edit this port
-    APP.run(port=1337) # Do not edit this port
+    # APP.run(port=0) # Do not edit this port
+    APP.run(port=0) # Do not edit this port
+
