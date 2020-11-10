@@ -1,7 +1,6 @@
 from error import InputError, AccessError
 import data
 import datetime
-import channels
 
 def message_send(token, channel_id, message):
     #Check if message length is not more than 1000.
