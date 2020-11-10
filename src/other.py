@@ -21,8 +21,10 @@ def users_all(token):
     all_users = data.data['users'].values()
 
     for u in all_users:
-        u.pop('password')
-        u.pop('is_global_owner')
+        if 'password' in u:
+            u.pop('password')
+        if  'is_global_owner' in u:
+            u.pop('is_global_owner')
 
     return list(all_users)
 
