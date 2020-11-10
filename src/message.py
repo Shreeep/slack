@@ -79,6 +79,7 @@ def message_react(token, message_id, react_id):
         raise InputError 
     user_id = data.data['tokens'][token]
     #Check if given message_id is valid - if not, raise InputError
+    check_if_message_exists(message_id)
     channel_id = check_which_channel_message_is_in(message_id) 
     #Check if user is apart of the channel that the message is in - if not, raise Access Error 
     check_if_valid_channel_and_member(channel_id, user_id)
@@ -128,12 +129,12 @@ def check_which_channel_message_is_in(message_id):
         for message in channel['messages']:
             if message['message_id'] == message_id: 
                 return channel['id']
-        raise InputError #raises input error if message_id does not exist 
+        
 
 def check_if_user_already_reacted(channel_id, message_id, user_id): 
     for channel in data.data['channels']: 
         if channel_id == channel['id']:
             for messages in channel['messages']:
                 if message_id == messages['message_id']: 
-                    if user_id in message['reacts'][0]['u_ids']:
+                    if user_id in messages['reacts'][0]['u_ids']:
                         raise InputError
