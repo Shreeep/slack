@@ -101,9 +101,39 @@ def test_logout_success():
 
 def test_logout_fail():
     clear()
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
     with pytest.raises(AccessError):
-        auth.auth_register('test@email.com', 'password', 'test', 'user')
         auth.auth_logout('invalidtoken')
 
 
+def test_passwordreset_success():
+    clear()
+    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('test@email.com')
+    auth.auth_passwordreset_reset('reset code', 'newpassword')
+
+    login1 = auth.auth_login('test@email.com', 'newpassword')
+    
+    assert login1['u_id'] == register1['u_id']
+
+    with pytest.raises(InputError):
+        auth.auth_login('test@email.com', 'password')
+
+
+def test_passwordreset_invalid_code():
+    clear()
+    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('test@email.com')
+
+    with pytest.raises(InputError):
+        auth.auth_passwordreset_reset('wrong code', 'newpassword')
+
+
+def test_passwordreset_invalid_password():
+    clear()
+    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('test@email.com')
+
+    with pytest.raises(InputError)
+        auth.auth_passwordreset_reset('reset code', '')    
 

@@ -118,3 +118,10 @@ def auth_register(email, password, name_first, name_last):
     data.token_id += 1
 
     return ret
+
+
+def auth_passwordreset_request(email):
+    pass
+
+def auth_passwordreset_reset(reset_code, new_password):
+    pass
