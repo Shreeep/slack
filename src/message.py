@@ -22,6 +22,7 @@ def message_send(token, channel_id, message):
         'u_id': user_id,
         'message': message,
         'time_created': time_created,
+        'reacts':[], 
     }
     
     #Append the new_message to data
