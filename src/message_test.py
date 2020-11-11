@@ -162,6 +162,45 @@ def test_message_react_already_reacted():
         message.message_react(user1['token'], message_id['message_id'], 1) #user is reacting to message he has already reacted to - raise input error 
     #therefore, user1 is already part of 'u_ids' and 'is_this_user_reacted' is true in reacts dict  
 
+def test_message_unreact():
+    other.clear()
+    user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
+    user2_member = auth.auth_register('howto@mail.com', 'qwerasdf', 'Conner', 'Walsh')
+    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    channel.channel_join(user2_member['token'], test_channel['channel_id'])
+    message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
+    message.message_react(user1['token'], message_id['message_id'], 1) #user reacting to his own message
+    message.message_react(user2_member['token'], message_id['message_id'], 1) #second user reacting to user1s
+    message.message_unreact(user1['token'], message_id['message_id'], 0)
+    message.message_unreact(user2_member['token'], message_id['message_id'], 0)
+
+def test_message_unreact_invalid_message_id():
+    other.clear()
+    user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
+    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    with pytest.raises(InputError):
+        message.message_unreact(user1['token'], 123, 0) #this should raise input error because the message_id doesnt exit i.e. 123
+
+
+def test_message_unreact_invalid_react_id():
+    other.clear()
+    user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
+    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
+    message.message_react(user1['token'], message_id['message_id'], 1)
+    with pytest.raises(InputError):
+        message.message_unreact(user1['token'], message_id['message_id'], 3) #this should raise input error becasue the react_id is not valid i.e 1 is the only valid react_id
+
+
+def test_message_unreact_already_unreacted():
+    other.clear()
+    user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
+    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
+    message.message_react(user1['token'], message_id['message_id'], 1)
+    message.message_unreact(user1['token'], message_id['message_id'], 0)
+    with pytest.raises(InputError):
+        message.message_unreact(user1['token'], message_id['message_id'], 0)
 #def test_message_sendlater():
-#def test_message_unreact():
+
 
