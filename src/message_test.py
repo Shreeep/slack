@@ -6,6 +6,7 @@ import pytest
 import other
 import data
 from error import InputError, AccessError
+from datetime import datetime, timedelta
 
 #White Box: 
 def test_message_send(): 
@@ -202,6 +203,24 @@ def test_message_unreact_already_unreacted():
     with pytest.raises(InputError):
         message.message_unreact(user1['token'], message_id['message_id'], 0)
 
-#def test_message_sendlater():
+#message sendlater is somewhat a wrapper on top of message/send
+#so this means other error checking is not neccessary i.e. valid channel id or valid token
+def test_message_sendlater():
+    other.clear()
+    user1 = auth.auth_register('qwer@gmail.com', 'abc123', 'Ben', 'Bobstar')
+    test_channel = channels.channels_create(user1['token'], 'Testing Channel A', True)
+    current_time = datetime.utcnow()
+    future_time = current_time + timedelta(seconds = 60) 
+    future_time_timestamp = int(future_time.timestamp())
+    message_id = message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', future_time_timestamp)
 
+def test_message_sendlater_wrongtime():
+    other.clear()
+    user1 = auth.auth_register('qwer@gmail.com', 'abc123', 'Ben', 'Bobstar')
+    test_channel = channels.channels_create(user1['token'], 'Testing Channel A', True)
+    current_time = datetime.utcnow()
+    past_time = current_time - timedelta(seconds = 60) 
+    past_time_timestamp = int(past_time.timestamp())
+    with pytest.raises(InputError):
+        message_id = message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', past_time_timestamp)
 
