@@ -422,6 +422,25 @@ def test_put_message_edit_empty(url):
     r_1 = requests.put(url + "/message/edit", json={'token': payload_user1['token'], 'message_id': result_payload['message_id'], 'message': ''})
     assert r_1.status_code == 200
     
+#def test_post_message_react(url):
+
+#def test_post_message_react_invalid_message_id(url):
+
+#def test_post_message_react_invalid_react_id(url): 
+
+#def test_post_message_react_already_reacted(url):
+
+#def test_post_message_unreact(url):
+
+#def test_post_message_unreact_invalid_message_id(url):
+
+#def test_post_message_unreact_invalid_react_id(url):
+ 
+#def test_post_message_unreact_already_unreacted(url):
+
+#def test_post_message_sendlater(url):
+
+#def test_post_message_sendlater_wrongtime(url): 
 
 
 

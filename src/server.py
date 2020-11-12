@@ -221,6 +221,16 @@ def edit_message():
     message.message_edit(decoded_jwt['token'], info['message_id'], info['message'])
     return dumps({})
 
+#@APP.route("/message/react", methods=['POST'])
+#def react_message():
+
+#@APP.route("/message/unreact", methods=['POST'])
+#def unreact_message():
+
+#@APP.route("/message/sendlater", methods=['POST'])
+#def send_message_later():
+
+
 @APP.route("/user/profile", methods=['GET'])
 def profile():
     token = request.args['token']
