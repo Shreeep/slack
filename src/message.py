@@ -21,7 +21,7 @@ def message_send(token, channel_id, message):
         'message_id': message_id,
         'u_id': user_id,
         'message': message,
-        'time_created': time_created,
+        'time_created': int(time_created),
         'reacts':[{ 
                     'react_id': 0,
                     'u_ids':[],
@@ -118,8 +118,43 @@ def message_unreact(token, message_id, react_id):
                         message['reacts'][0]['is_this_user_reacted'] = False
     return {}
 
-#def message_sendlater(token, channel_id, message, time_sent):
+def message_sendlater(token, channel_id, message, time_sent):
+    #Check if message length is not more than 1000.
+    if len(message) > 1000:
+        raise InputError
+    
+    #Check if user is a member of the channel.
+    #If so, they are authorised to send messages to the channel. 
+    user_id = data.data['tokens'][token]
+    check_if_valid_channel_and_member(channel_id, user_id)
+    
+    #Assigning attribute data to message entity - to then later be stored in data.py 
+    current_time = datetime.datetime.utcnow()
+    #Check if time_sent is a time in the past - if so, raise InputError 
+    if int(time_sent.timestamp()) <= int(current_time.timestamp()):
+        raise InputError
+    data.message_id += 1
+    message_id = data.message_id
+    new_message = {
+        'message_id': message_id,
+        'u_id': user_id,
+        'message': message,
+        'time_created': int(time_sent.timestamp()),
+        'reacts':[{ 
+                    'react_id': 0,
+                    'u_ids':[],
+                    'is_this_user_reacted': False,
+                },
+        ], 
+    }
+    #Append the new_message to data
+    for channel in data.data['channels']:
+        if channel_id == channel['id']:
+            channel['messages'].insert(0, new_message)
 
+    return {
+        'message_id': message_id,
+    }   
 
 #Credit: Taken from channel.py - the file Shree and Vignaraj have worked on
 #The function checks if the user is a member of the channel. 
