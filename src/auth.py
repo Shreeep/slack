@@ -131,35 +131,23 @@ def auth_passwordreset_request(email):
     # check the entered email is an email saved in the data
     for user in all_users:
         if email in user['email']:
-            # maybe save it in another dictionary?
-            print('reset code' + str(user['u_id']))
+            
+            # generate reset code
+            reset_code = user['email'] + user['password']
+
+            # storing reset code
+            data.data['reset_code'][reset_code] = user['u_id']
 
   
-
 def auth_passwordreset_reset(reset_code, new_password):
-
-    all_users = data.data['users'].values()
 
     if len(new_password) < data.MIN_PW_LEN:
         raise InputError
 
+    if reset_code in data.data['reset_code']:
+        u_id = data.data['reset_code'][reset_code]
+        data.data['users'][u_id]['password'] = new_password
 
-    # check the entered email is an email saved in the data
-    for user in all_users:
+    else:
+        raise InputError
 
-        if reset_code != 'reset code' + str(user['u_id']):
-            raise InputError
-
-        # if saved in another dictionary, makes it easier
-        if reset_code == 'reset code' + str(user['u_id']):
-            user['password'] = new_password
-            # print(user['password'])
-    
-
-# auth_register('test@email.com', 'password', 'test', 'user')
-# auth_register('test2@email.com', 'password2', 'test2', 'user2')
-# auth_passwordreset_request('test@email.com')
-# auth_passwordreset_reset('reset code1', 'thisisasuccess')
-# auth_logout('token1')
-# auth_login('test@email.com', 'thisisasuccess')
-# print(data.data)

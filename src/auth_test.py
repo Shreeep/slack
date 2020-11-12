@@ -110,14 +110,48 @@ def test_passwordreset_success():
     clear()
     register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
     auth.auth_passwordreset_request('test@email.com')
-    auth.auth_passwordreset_reset('reset code1', 'newpassword')
+    auth.auth_passwordreset_reset('test@email.compassword', 'newpassword')
 
     login1 = auth.auth_login('test@email.com', 'newpassword')
     
     assert login1['u_id'] == register1['u_id']
 
+
+def test_passwordreset_success_multiple():
+    clear()
+    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    register2 = auth.auth_register('test2@email.com', 'password2', 'test', 'user')
+
+    auth.auth_passwordreset_request('test@email.com')
+    auth.auth_passwordreset_reset('test@email.compassword', 'newpassword')
+
+    login1 = auth.auth_login('test@email.com', 'newpassword')
+    
+    assert login1['u_id'] == register1['u_id']
+    
+    login2 = auth.auth_login('test2@email.com', 'password2')
+    auth.auth_passwordreset_request('test2@email.com')
+    auth.auth_passwordreset_reset('test2@email.compassword2', 'PASSWORD')    
+    login2 = auth.auth_login('test2@email.com', 'PASSWORD')
+
+    assert login2['u_id'] == register2['u_id']
+
+
+def test_passwordreset_old_pw_fail():
+    clear()
+    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('test@email.com')
+    auth.auth_passwordreset_reset('test@email.compassword', 'newpassword')
+
     with pytest.raises(InputError):
         auth.auth_login('test@email.com', 'password')
+
+def test_passwordreset_invalid_email():
+    clear()
+    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+   
+    with pytest.raises(InputError):
+        auth.auth_passwordreset_request('test2email.com')
 
 
 def test_passwordreset_invalid_code():
@@ -126,7 +160,7 @@ def test_passwordreset_invalid_code():
     auth.auth_passwordreset_request('test@email.com')
 
     with pytest.raises(InputError):
-        auth.auth_passwordreset_reset('wrong code', 'newpassword')
+        auth.auth_passwordreset_reset('', 'newpassword')
 
 
 def test_passwordreset_invalid_password():
@@ -135,5 +169,5 @@ def test_passwordreset_invalid_password():
     auth.auth_passwordreset_request('test@email.com')
 
     with pytest.raises(InputError):
-        auth.auth_passwordreset_reset('reset code', '')    
+        auth.auth_passwordreset_reset('test@email.compassword', '')    
 
