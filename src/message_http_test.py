@@ -133,7 +133,8 @@ def test_delete_message_remove(url):
     requests.post(url + "/message/send", json=message_one)
     accidental_message = requests.post(url + "/message/send", json=message_two)
     result = accidental_message.json()
-    requests.delete(url + "/message/remove", params={'token': payload_user1['token'], 'message_id': result['message_id']})
+    deletion = requests.delete(url + "/message/remove", params={'token': payload_user1['token'], 'message_id': result['message_id']})
+    assert deletion.status_code == 200
 
 def test_delete_message_remove_no_longer_exists(url):
     #Remove a message
@@ -759,6 +760,7 @@ def test_message_pin_success(url):
     }
 
     pinned_message = requests.post(url + "/message/pin", json=message_pin_inputs)
+    #success case
     assert pinned_message.status_code == 200
 
 def test_message_pin_already_pinned(url):
@@ -792,14 +794,15 @@ def test_message_pin_already_pinned(url):
         'token' : payload_user1['token'],
         'message_id' : result['message_id']
     }
-
     pinned_message = requests.post(url + "/message/pin", json=message_pin_inputs)
-    pinned_message_again = requests.post(url + "/message/pin", json=message_pin_inputs)
+    pinned_message = requests.post(url + "/message/pin", json=message_pin_inputs)
+
     #fails because InputError raised when already pinned
-    assert pinned_message_again.status_code == 400
-    
+    assert pinned_message.status_code == 400
+
 def test_message_unpin_success(url):
     pass
+
 def test_message_unpin_already_unpinned(url):
     pass
 
