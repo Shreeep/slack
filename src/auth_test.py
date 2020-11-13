@@ -119,7 +119,7 @@ def test_passwordreset_success():
 
 def test_passwordreset_old_pw_fail():
     clear()
-    register1 = auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
     auth.auth_passwordreset_request('comp1531testuser@gmail.com')
     auth.auth_passwordreset_reset('d9515429f13ac55be806a691b61ce0a3f505d97517ae22da7e22f2f6bd92f986', 'newpassword')
 
@@ -128,7 +128,7 @@ def test_passwordreset_old_pw_fail():
 
 def test_passwordreset_invalid_email():
     clear()
-    register1 = auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
    
     with pytest.raises(InputError):
         auth.auth_passwordreset_request('test2email.com')
