@@ -892,7 +892,7 @@ def test_message_unpin_already_unpinned(url):
     register_user1 = requests.post(url + "/auth/register", json=user1)
     payload_user1 = register_user1.json()
 
-    register_user2 = requests.post(url + "/auth/register", json=user2)
+    requests.post(url + "/auth/register", json=user2)
     payload_user2 = register_user1.json()
     #Create channel associated with user:
     test_channel_one_details = {

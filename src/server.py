@@ -242,6 +242,13 @@ def send_message_later():
     user_message_sendlater = message.message_sendlater(decoded_jwt['token'], info['channel_id'], info['message'], info['time_sent'])
     return dumps(user_message_sendlater)
 
+@APP.route("/message/pin", methods=['POST'])
+def pin_message():
+    info = request.get_json
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    message.message_pin(decoded_jwt['token'], info['message_id'])
+    return dumps({})
+
 @APP.route("/user/profile", methods=['GET'])
 def profile():
     token = request.args['token']
