@@ -6,13 +6,13 @@ from error import InputError
 import auth
 import channel
 import channels
-import channel
 import message
 import user
 import other
 import hashlib
 import jwt
 import data
+import standup
 
 
 def defaultHandler(err):
@@ -134,11 +134,11 @@ def details():
 def messages():
     # get the info
     token = request.args.get('token')
-    channel_id = request.args.get('channel_id', default = 1, type = int)
-    start = request.args.get('start', default = 0, type = int)
+    channel_id = request.args.get('channel_id', default=1, type=int)
+    star = request.args.get('start', default=0, type=int)
     decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
 
-    result = channel.channel_messages(decoded_jwt['token'], channel_id, start)
+    result = channel.channel_messages(decoded_jwt['token'], channel_id, star)
 
     return dumps(result)
     
@@ -291,6 +291,30 @@ def search():
 def clear():
     other.clear()
     return dumps({})
+
+@APP.route("/standup/start", methods=['POST'])
+def start():
+    # get user info
+    start_data = request.get_json()  
+    decoded_jwt = jwt.decode(start_data['token'], data.jwt_secret, algorithm='HS256')
+    result = standup.standup_start(decoded_jwt['token'], start_data['channel_id'], start_data['length'])
+    return dumps(result)
+
+@APP.route("/standup/active", methods=['GET'])
+def active():
+    token = request.args['token']
+    channel_id = request.args['channel_id']
+    decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
+    result = other.search(decoded_jwt['token'], channel_id)
+    return dumps(result)
+
+@APP.route("/standup/send", methods=['POST'])
+def send():
+    # get user info
+    send_data = request.get_json()  
+    decoded_jwt = jwt.decode(send_data['token'], data.jwt_secret, algorithm='HS256')
+    result = standup.standup_start(decoded_jwt['token'], send_data['channel_id'], send_data['message'])
+    return dumps(result)
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port

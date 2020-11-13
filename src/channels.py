@@ -81,6 +81,9 @@ def channels_create(token, name, is_public):
         'owners': [],
         'is_public': is_public,
         'messages': [], #Empty for Iteration 1
+        'is_active': False,
+        'time_finish': 0,
+        'standup_message': '',
     }
 
     #Setting the owner's detail
