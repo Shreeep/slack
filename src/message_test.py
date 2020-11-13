@@ -211,7 +211,7 @@ def test_message_sendlater():
     test_channel = channels.channels_create(user1['token'], 'Testing Channel A', True)
     current_time = datetime.utcnow()
     future_time = current_time + timedelta(seconds = 60) 
-    message_id = message.message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', future_time)
+    message_id = message.message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', int(future_time.timestamp()))
 
 def test_message_sendlater_wrongtime():
     other.clear()
@@ -220,5 +220,5 @@ def test_message_sendlater_wrongtime():
     current_time = datetime.utcnow()
     past_time = current_time - timedelta(seconds = 60) 
     with pytest.raises(InputError):
-        message_id = message.message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', past_time)
+        message_id = message.message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', int(past_time.timestamp()))
 

@@ -95,6 +95,7 @@ def message_react(token, message_id, react_id):
                     if message['u_id'] == user_id:
                         message['reacts'][0]['is_this_user_reacted'] = True 
     return {}
+    
 def message_unreact(token, message_id, react_id):
     if (react_id != 0):
         raise InputError
@@ -131,7 +132,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     #Assigning attribute data to message entity - to then later be stored in data.py 
     current_time = datetime.datetime.utcnow()
     #Check if time_sent is a time in the past - if so, raise InputError 
-    if int(time_sent.timestamp()) <= int(current_time.timestamp()):
+    if  time_sent <= int(current_time.timestamp()):
         raise InputError
     data.message_id += 1
     message_id = data.message_id
@@ -139,7 +140,7 @@ def message_sendlater(token, channel_id, message, time_sent):
         'message_id': message_id,
         'u_id': user_id,
         'message': message,
-        'time_created': int(time_sent.timestamp()),
+        'time_created': time_sent,
         'reacts':[{ 
                     'react_id': 0,
                     'u_ids':[],

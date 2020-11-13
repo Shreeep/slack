@@ -6,6 +6,7 @@ import signal
 from time import sleep
 import requests
 import json
+from datetime import datetime, timedelta
 
 @pytest.fixture
 def url():
@@ -449,7 +450,8 @@ def test_post_message_react(url):
     }
     send_message = requests.post(url + "/message/send", json=message_info)
     result = send_message.json()
-    requests.post(url + "/message/react", json=result)
+    successful_react =requests.post(url + "/message/react", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 1})
+    assert successful_react.status_code == 200
 
 
 def test_post_message_react_invalid_message_id(url):
@@ -479,8 +481,7 @@ def test_post_message_react_invalid_message_id(url):
     }
     send_message = requests.post(url + "/message/send", json=message_info)
     result = send_message.json()
-    result['message_id'] = result['message_id'] + 100
-    invalid_message_id_request = requests.post(url + "/message/react", json=result)
+    invalid_message_id_request = requests.post(url + "/message/react", json={'token':payload_user1['token'], 'message_id': result['message_id'] + 100, 'react_id': 1})
     assert invalid_message_id_request.status_code == 400
 
 def test_post_message_react_invalid_react_id(url): 
@@ -510,9 +511,8 @@ def test_post_message_react_invalid_react_id(url):
     }
     send_message = requests.post(url + "/message/send", json=message_info)
     result = send_message.json()
-    result['reacts'][0]['react_id'] = 3 
-    invalid_react_id_request = requests.post(url + "/message/react", json=result)
-    assert invalid_message_id_request.status_code == 400
+    invalid_react_id_request = requests.post(url + "/message/react", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 3})
+    assert invalid_react_id_request.status_code == 400
 
 def test_post_message_react_already_reacted(url):
     # User info:
@@ -541,8 +541,8 @@ def test_post_message_react_already_reacted(url):
     }
     send_message = requests.post(url + "/message/send", json=message_info)
     result = send_message.json()
-    requests.post(url + "/message/react", json=result)
-    already_reacted_request = requests.post(url + "message/react", json=result)
+    requests.post(url + "/message/react", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 1})
+    already_reacted_request = requests.post(url + "message/react", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 1})
     assert already_reacted_request.status_code == 400
 
 def test_post_message_unreact(url):
@@ -572,8 +572,9 @@ def test_post_message_unreact(url):
     }
     send_message = requests.post(url + "/message/send", json=message_info)
     result = send_message.json()
-    requests.post(url + "/message/react", json=result)
-    requests.post(url + "/message/unreact", json=result)
+    requests.post(url + "/message/react", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 1})
+    successful_unreact = requests.post(url + "/message/unreact", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 0})
+    assert successful_unreact.status_code == 200
 
 def test_post_message_unreact_invalid_message_id(url):
     # User info:
@@ -603,8 +604,7 @@ def test_post_message_unreact_invalid_message_id(url):
     send_message = requests.post(url + "/message/send", json=message_info)
     result = send_message.json()
     requests.post(url + "/message/react", json=result)
-    result['message_id'] = result['message_id'] + 100
-    invalid_unreact_message_id = requests.post(url + "/message/unreact", json=result)
+    invalid_unreact_message_id = requests.post(url + "/message/unreact", json={'token':payload_user1['token'], 'message_id': result['message_id'] + 100, 'react_id': 0})
     assert invalid_unreact_message_id.status_code == 400
 
 def test_post_message_unreact_invalid_react_id(url):
@@ -635,8 +635,7 @@ def test_post_message_unreact_invalid_react_id(url):
     send_message = requests.post(url + "/message/send", json=message_info)
     result = send_message.json()
     requests.post(url + "/message/react", json=result)
-    result['reacts'][0]['react_id'] = 3 
-    invalid_react_id_request = requests.post(url + "/message/unreact", json=result)
+    invalid_react_id_request = requests.post(url + "/message/unreact", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 3})
     assert invalid_react_id_request.status_code == 400
  
 def test_post_message_unreact_already_unreacted(url):
@@ -666,9 +665,9 @@ def test_post_message_unreact_already_unreacted(url):
     }
     send_message = requests.post(url + "/message/send", json=message_info)
     result = send_message.json()
-    requests.post(url + "/message/react", json=result)
-    requests.post(url + "/message/unreact", json=result)
-    already_unreacted = requests.post(url + "/message/unreact", json=result)
+    requests.post(url + "/message/react", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 1})
+    requests.post(url + "/message/unreact", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 0})
+    already_unreacted = requests.post(url + "/message/unreact", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 0})
     assert already_unreacted.status_code == 400
 
 def test_post_message_sendlater(url):
@@ -693,13 +692,10 @@ def test_post_message_sendlater(url):
     payload_channel_one = create_channel_one.json()
     current_time = datetime.utcnow()
     future_time = current_time + timedelta(seconds = 60) 
-    message_info = {
-        'token': payload_user1['token'],
-        'channel_id': payload_channel_one['channel_id'],
-        'message': 'Test Message Hello Hello'
-        'time_sent': future_time
-    }
-    send_message_later = requests.post(url + "/message/sendlater", json=message_info)
+    send_message_later = requests.post(url + "/message/sendlater", json={'token': payload_user1['token'], 'channel_id': payload_channel_one['channel_id'],
+        'message': 'Test Message Hello Hello',
+        'time_sent': int(future_time.timestamp()),
+    })
     assert send_message_later.status_code == 200
 
 def test_post_message_sendlater_wrongtime(url): 
@@ -724,13 +720,10 @@ def test_post_message_sendlater_wrongtime(url):
     payload_channel_one = create_channel_one.json()
     current_time = datetime.utcnow()
     past_time = current_time - timedelta(seconds = 60) 
-    message_info = {
-        'token': payload_user1['token'],
-        'channel_id': payload_channel_one['channel_id'],
-        'message': 'Test Message Hello Hello'
-        'time_sent': past_time
-    }
-    send_message_later = requests.post(url + "/message/sendlater", json=message_info)
+    send_message_later = requests.post(url + "/message/sendlater", json={'token': payload_user1['token'], 'channel_id': payload_channel_one['channel_id'],
+        'message': 'Test Message Hello Hello',
+        'time_sent': int(past_time.timestamp()),
+    })
     assert send_message_later.status_code == 400
 
 
