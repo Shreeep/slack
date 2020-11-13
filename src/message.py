@@ -158,7 +158,6 @@ def message_sendlater(token, channel_id, message, time_sent):
         'message_id': message_id,
     }   
 
-
 #Credit: Taken from channel.py - the file Shree and Vignaraj have worked on
 #The function checks if the user is a member of the channel. 
 def check_if_valid_channel_and_member(channel_id, u_id):
