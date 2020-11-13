@@ -108,24 +108,24 @@ def test_logout_fail():
 
 def test_passwordreset_success():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
-    auth.auth_passwordreset_request('test@email.com')
-    auth.auth_passwordreset_reset('test@email.compassword', 'newpassword')
+    register1 = auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('comp1531testuser@gmail.com')
+    auth.auth_passwordreset_reset('comp1531testuser@gmail.compassword', 'newpassword')
 
-    login1 = auth.auth_login('test@email.com', 'newpassword')
+    login1 = auth.auth_login('comp1531testuser@gmail.com', 'newpassword')
     
     assert login1['u_id'] == register1['u_id']
 
 
 def test_passwordreset_success_multiple():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    register1 = auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
     register2 = auth.auth_register('test2@email.com', 'password2', 'test', 'user')
 
-    auth.auth_passwordreset_request('test@email.com')
-    auth.auth_passwordreset_reset('test@email.compassword', 'newpassword')
+    auth.auth_passwordreset_request('comp1531testuser@gmail.com')
+    auth.auth_passwordreset_reset('comp1531testuser@gmail.compassword', 'newpassword')
 
-    login1 = auth.auth_login('test@email.com', 'newpassword')
+    login1 = auth.auth_login('comp1531testuser@gmail.com', 'newpassword')
     
     assert login1['u_id'] == register1['u_id']
     
@@ -139,16 +139,16 @@ def test_passwordreset_success_multiple():
 
 def test_passwordreset_old_pw_fail():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
-    auth.auth_passwordreset_request('test@email.com')
-    auth.auth_passwordreset_reset('test@email.compassword', 'newpassword')
+    register1 = auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('comp1531testuser@gmail.com')
+    auth.auth_passwordreset_reset('comp1531testuser@gmail.compassword', 'newpassword')
 
     with pytest.raises(InputError):
-        auth.auth_login('test@email.com', 'password')
+        auth.auth_login('comp1531testuser@gmail.com', 'password')
 
 def test_passwordreset_invalid_email():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
+    register1 = auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
    
     with pytest.raises(InputError):
         auth.auth_passwordreset_request('test2email.com')
@@ -156,8 +156,8 @@ def test_passwordreset_invalid_email():
 
 def test_passwordreset_invalid_code():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
-    auth.auth_passwordreset_request('test@email.com')
+    register1 = auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('comp1531testuser@gmail.com')
 
     with pytest.raises(InputError):
         auth.auth_passwordreset_reset('', 'newpassword')
@@ -165,9 +165,9 @@ def test_passwordreset_invalid_code():
 
 def test_passwordreset_invalid_password():
     clear()
-    register1 = auth.auth_register('test@email.com', 'password', 'test', 'user')
-    auth.auth_passwordreset_request('test@email.com')
+    register1 = auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('comp1531testuser@gmail.com')
 
     with pytest.raises(InputError):
-        auth.auth_passwordreset_reset('test@email.compassword', '')    
+        auth.auth_passwordreset_reset('comp1531testuser@gmail.compassword', '')    
 

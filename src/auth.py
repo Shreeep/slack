@@ -1,5 +1,8 @@
 import re
 import data
+import smtplib, ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from error import InputError, AccessError
 
 
@@ -137,6 +140,26 @@ def auth_passwordreset_request(email):
 
             # storing reset code
             data.data['reset_code'][reset_code] = user['u_id']
+
+            port = 465
+
+            msg_info = MIMEMultipart()
+
+
+            msg_info['From'] = "comp1531testuser@gmail.com"
+            msg_info['To'] = email
+            msg_info['Subject'] = 'Flockr password reset code'
+            message = 'Here is your reset code. \n' + reset_code
+
+            msg_info.attach(MIMEText(message, 'plain'))
+
+            smtp_server = "smtp.gmail.com"
+            password = 'C0MP1531T3stus3r'
+
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                server.login(msg_info['From'], password)
+                server.sendmail(msg_info['From'], msg_info['To'], msg_info.as_string())
 
   
 def auth_passwordreset_reset(reset_code, new_password):
