@@ -28,6 +28,7 @@ def message_send(token, channel_id, message):
                     'is_this_user_reacted': False,
                 },
         ],
+        'is_pinned' : False
     }
     
     #Append the new_message to data
@@ -156,6 +157,7 @@ def message_sendlater(token, channel_id, message, time_sent):
     return {
         'message_id': message_id,
     }   
+
 
 #Credit: Taken from channel.py - the file Shree and Vignaraj have worked on
 #The function checks if the user is a member of the channel. 
