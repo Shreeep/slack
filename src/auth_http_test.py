@@ -341,9 +341,9 @@ def test_post_passwordreset_success(url):
     requests.post(url + "/auth/passwordreset/request", json=email)
 
     # hashing reset code
-    # code = hashlib.sha256(str(dataIn['email'] + dataIn['password']).encode()).hexdigest()
+    # hashed reset code received from email
     reset_info = {
-        'reset_code': '4c03c351661dbda22dc77db9b055bb3ae3c54f0bacee573c957f2f012ca5592',
+        'reset_code': '4c03c351661dbda22dc77db9b055bb3ae3c54f0bacee573c957f2f012ca55924',
         'new_password': 'password123',
     }
 
@@ -368,6 +368,7 @@ def test_post_passwordreset_success(url):
     assert user['email'] == dataIn['email']
     assert user['name_first'] == dataIn['name_first']
     assert user['name_last'] == dataIn['name_last']
+
 
 def test_post_passwordreset_fail(url):
     # user info 1

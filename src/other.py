@@ -1,4 +1,5 @@
 import data
+import copy
 from error import InputError, AccessError
 
 def clear():
@@ -18,13 +19,12 @@ def users_all(token):
     if token not in data.data['tokens']:
         raise AccessError
     
-    all_users = data.data['users'].values()
+    new_users_dict = copy.deepcopy(data.data['users'])
+    all_users = new_users_dict.values()
 
     for u in all_users:
-        if 'password' in u:
-            u.pop('password')
-        if  'is_global_owner' in u:
-            u.pop('is_global_owner')
+        u.pop('password')
+        u.pop('is_global_owner')
 
     return list(all_users)
 
