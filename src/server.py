@@ -221,15 +221,26 @@ def edit_message():
     message.message_edit(decoded_jwt['token'], info['message_id'], info['message'])
     return dumps({})
 
-#@APP.route("/message/react", methods=['POST'])
-#def react_message():
+@APP.route("/message/react", methods=['POST'])
+def react_message():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    user_react = message.message_react(decoded_jwt['token'], info['message_id'],  info['react_id'])
+    return dumps({})
 
-#@APP.route("/message/unreact", methods=['POST'])
-#def unreact_message():
+@APP.route("/message/unreact", methods=['POST'])
+def unreact_message():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    user_unreact = message.message_unreact(decoded_jwt['token'], info['message_id'],  info['react_id'])
+    return dumps({})
 
-#@APP.route("/message/sendlater", methods=['POST'])
-#def send_message_later():
-
+@APP.route("/message/sendlater", methods=['POST'])
+def send_message_later():
+    info = request.get_json()
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    user_message_sendlater = message.message_sendlater(decoded_jwt['token'], info['channel_id'], info['message'], info['time_sent'])
+    return dumps(user_message_sendlater)
 
 @APP.route("/user/profile", methods=['GET'])
 def profile():
