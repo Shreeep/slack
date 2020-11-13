@@ -21,7 +21,13 @@ def message_send(token, channel_id, message):
         'message_id': message_id,
         'u_id': user_id,
         'message': message,
-        'time_created': time_created,
+        'time_created': int(time_created),
+        'reacts':[{ 
+                    'react_id': 0,
+                    'u_ids':[],
+                    'is_this_user_reacted': False,
+                },
+        ],
     }
     
     #Append the new_message to data
@@ -68,6 +74,89 @@ def message_edit(token, message_id, message):
                 raise AccessError
     return {}
 
+def message_react(token, message_id, react_id):
+    if (react_id != 1):
+        raise InputError 
+    user_id = data.data['tokens'][token]
+    #Check if given message_id is valid - if not, raise InputError
+    check_if_message_exists(message_id)
+    channel_id = check_which_channel_message_is_in(message_id) 
+    #Check if user is apart of the channel that the message is in - if not, raise Access Error 
+    check_if_valid_channel_and_member(channel_id, user_id)
+    #Check if user has already reacted to that particular message - if not, raise InputError 
+    check_if_user_already_reacted(channel_id, message_id, user_id)
+    #Set react_id, add user_id to u_ids list, and if the user is the original sender, set _is_this_user_reacted to True  
+    for channel in data.data['channels']:
+        if channel_id == channel['id']:
+            for message in channel['messages']: 
+                if message_id == message['message_id']: 
+                    message['reacts'][0]['react_id'] = react_id
+                    message['reacts'][0]['u_ids'].append(user_id)
+                    if message['u_id'] == user_id:
+                        message['reacts'][0]['is_this_user_reacted'] = True 
+    return {}
+    
+def message_unreact(token, message_id, react_id):
+    if (react_id != 0):
+        raise InputError
+    user_id = data.data['tokens'][token]
+    #Check if given message_id is valid - if not, raise InputError
+    check_if_message_exists(message_id)
+    channel_id = check_which_channel_message_is_in(message_id) 
+    #Check if user is apart of the channel that the message is in - if not, raise Access Error 
+    check_if_valid_channel_and_member(channel_id, user_id)
+    #Check if user has not reacted to message - if they haven't reacted, theres no point unreacting, raise Input Error 
+    check_if_user_already_unreacted(channel_id, message_id, user_id)
+    for channel in data.data['channels']:
+        if channel_id == channel['id']:
+            for message in channel['messages']:
+                if message_id == message['message_id']:
+                    message['reacts'][0]['u_ids'].remove(user_id)
+                    if message['u_id'] == user_id:
+                        message['reacts'][0]['is_this_user_reacted'] = False
+                    if not message['reacts'][0]['u_ids']: #checks if u_ids list is empty - if it is, set react_id to 0 since no one has reacted to it anymore
+                        message['reacts'][0]['react_id'] = react_id
+                        message['reacts'][0]['is_this_user_reacted'] = False
+    return {}
+
+def message_sendlater(token, channel_id, message, time_sent):
+    #Check if message length is not more than 1000.
+    if len(message) > 1000:
+        raise InputError
+    
+    #Check if user is a member of the channel.
+    #If so, they are authorised to send messages to the channel. 
+    user_id = data.data['tokens'][token]
+    check_if_valid_channel_and_member(channel_id, user_id)
+    
+    #Assigning attribute data to message entity - to then later be stored in data.py 
+    current_time = datetime.datetime.utcnow()
+    #Check if time_sent is a time in the past - if so, raise InputError 
+    if  time_sent <= int(current_time.timestamp()):
+        raise InputError
+    data.message_id += 1
+    message_id = data.message_id
+    new_message = {
+        'message_id': message_id,
+        'u_id': user_id,
+        'message': message,
+        'time_created': time_sent,
+        'reacts':[{ 
+                    'react_id': 0,
+                    'u_ids':[],
+                    'is_this_user_reacted': False,
+                },
+        ], 
+    }
+    #Append the new_message to data
+    for channel in data.data['channels']:
+        if channel_id == channel['id']:
+            channel['messages'].insert(0, new_message)
+
+    return {
+        'message_id': message_id,
+    }   
+
 #Credit: Taken from channel.py - the file Shree and Vignaraj have worked on
 #The function checks if the user is a member of the channel. 
 def check_if_valid_channel_and_member(channel_id, u_id):
@@ -92,3 +181,26 @@ def check_if_user_is_owner(channel_id, user_id):
             if not any(owner['u_id'] == user_id for owner in channel['owners']):
                 return False
     return True
+
+def check_which_channel_message_is_in(message_id):
+    for channel in data.data['channels']:
+        for message in channel['messages']:
+            if message['message_id'] == message_id: 
+                return channel['id']
+        
+
+def check_if_user_already_reacted(channel_id, message_id, user_id): 
+    for channel in data.data['channels']: 
+        if channel_id == channel['id']:
+            for messages in channel['messages']:
+                if message_id == messages['message_id']: 
+                    if user_id in messages['reacts'][0]['u_ids']:
+                        raise InputError
+
+def check_if_user_already_unreacted(channel_id, message_id, user_id): 
+    for channel in data.data['channels']:
+        if channel_id == channel['id']:
+            for messages in channel['messages']:
+                if message_id == messages['message_id']:
+                    if user_id not in messages['reacts'][0]['u_ids']:
+                        raise InputError
