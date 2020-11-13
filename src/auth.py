@@ -1,5 +1,6 @@
 import re
 import data
+import hashlib
 import smtplib, ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -133,19 +134,20 @@ def auth_passwordreset_request(email):
 
     # check the entered email is an email saved in the data
     for user in all_users:
-        if email in user['email']:
+        if email == user['email']:
             
             # generate reset code
-            reset_code = user['email'] + user['password']
+            reset_code = hashlib.sha256(str(user['email'] + user['password']).encode()).hexdigest()
 
             # storing reset code
             data.data['reset_code'][reset_code] = user['u_id']
 
+            # sending email
             port = 465
 
             msg_info = MIMEMultipart()
 
-
+            # message sent
             msg_info['From'] = "comp1531testuser@gmail.com"
             msg_info['To'] = email
             msg_info['Subject'] = 'Flockr password reset code'
@@ -170,6 +172,7 @@ def auth_passwordreset_reset(reset_code, new_password):
     if reset_code in data.data['reset_code']:
         u_id = data.data['reset_code'][reset_code]
         data.data['users'][u_id]['password'] = new_password
+        data.data['reset_code'].pop(reset_code)
 
     else:
         raise InputError

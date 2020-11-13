@@ -98,6 +98,32 @@ def logout():
 
     return dumps(is_success)
 
+
+@APP.route("/auth/passwordreset/request", methods=['POST'])
+def auth_passwordreset_request():
+
+    # get user info
+    user_info = request.get_json()
+
+    # request reset code
+    auth.auth_passwordreset_request(user_info['email'])
+
+    return dumps({})
+
+
+@APP.route("/auth/passwordreset/reset", methods=['POST'])
+def auth_passwordreset_reset():
+
+    # get user info
+    user_info = request.get_json()
+
+    # reset password
+    hashpw = hashlib.sha256(user_info['new_password'].encode()).hexdigest()
+    auth.auth_passwordreset_reset(user_info['reset_code'], hashpw)
+
+    return dumps({})
+
+
 @APP.route("/users/all", methods=['GET'])
 def users_all():
 
@@ -272,6 +298,7 @@ def clear():
     return dumps({})
 
 if __name__ == "__main__":
-    APP.run(port=0) # Do not edit this port
+    # APP.run(port=0) # Do not edit this port
+    APP.run(port=1337) # Do not edit this port
 
 
