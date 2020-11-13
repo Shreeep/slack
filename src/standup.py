@@ -15,7 +15,7 @@ def standup_start(token, channel_id, length):
     # add member to channel if he is already not there
     date = datetime.now()
     timestamp = date.replace(tzinfo=timezone.utc).timestamp() + length
-    start_time = threading.Timer(length, timer_over(token, channel_id))
+    start_time = threading.Timer(length, timer_over, [token, channel_id])
     start_time.start()
     all_channels = data.data['channels']
     for channel in all_channels:
