@@ -838,5 +838,40 @@ def test_message_unpin_success(url):
     assert unpinned_message.status_code == 200
 
 def test_message_unpin_already_unpinned(url):
-    pass
+    user1 = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+    # Register user:
+    register_user1 = requests.post(url + "/auth/register", json=user1)
+    payload_user1 = register_user1.json()
+
+    #Create channel associated with user:
+    test_channel_one_details = {
+        'token': payload_user1['token'],
+        'name': 'Public Channel #1',
+        'is_public': True 
+    }
+    create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
+    payload_channel_one = create_channel_one.json()
+    message_info = {
+        'token': payload_user1['token'],
+        'channel_id': payload_channel_one['channel_id'],
+        'message': 'Test Message Hello Hello'
+    }
+    send_message = requests.post(url + "/message/send", json=message_info)
+    result = send_message.json()
+
+    message_pin_inputs = {
+        'token' : payload_user1['token'],
+        'message_id' : result['message_id']
+    }
+    requests.post(url + "/message/pin", json=message_pin_inputs)
+    requests.post(url + "/message/unpin", json=message_pin_inputs)
+    unpinned_message = requests.post(url + "/message/unpin", json=message_pin_inputs)
+
+    #fails because InputError raised when already unpinned
+    assert unpinned_message.status_code == 400
 
