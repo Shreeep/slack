@@ -27,7 +27,7 @@ def message_send(token, channel_id, message):
                     'u_ids':[],
                     'is_this_user_reacted': False,
                 },
-        ], 
+        ],
     }
     
     #Append the new_message to data
