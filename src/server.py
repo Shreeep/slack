@@ -249,6 +249,13 @@ def pin_message():
     message.message_pin(decoded_jwt['token'], info['message_id'])
     return dumps({})
 
+@APP.route("/message/unpin", methods=['POST'])
+def unpin_message():
+    info = request.get_json
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    message.message_unpin(decoded_jwt['token'], info['message_id'])
+    return dumps({})
+
 @APP.route("/user/profile", methods=['GET'])
 def profile():
     token = request.args['token']
