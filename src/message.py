@@ -147,7 +147,8 @@ def message_sendlater(token, channel_id, message, time_sent):
                     'u_ids':[],
                     'is_this_user_reacted': False,
                 },
-        ], 
+        ],
+        'is_pinned' : False
     }
     #Append the new_message to data
     for channel in data.data['channels']:
