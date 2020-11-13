@@ -141,7 +141,7 @@ def test_message_react():
 def test_message_react_invalid_message_id(): 
     other.clear()
     user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
-    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    channels.channels_create(user1['token'], 'Test Channel B', True)
     with pytest.raises(InputError):
         message.message_react(user1['token'], 123, 1) #this should raise input error because the message_id doesnt exit i.e. 123
 
@@ -178,7 +178,7 @@ def test_message_unreact():
 def test_message_unreact_invalid_message_id():
     other.clear()
     user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
-    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    channels.channels_create(user1['token'], 'Test Channel B', True)
     with pytest.raises(InputError):
         message.message_unreact(user1['token'], 123, 0) #this should raise input error because the message_id doesnt exit i.e. 123
 
@@ -211,7 +211,7 @@ def test_message_sendlater():
     test_channel = channels.channels_create(user1['token'], 'Testing Channel A', True)
     current_time = datetime.utcnow()
     future_time = current_time + timedelta(seconds = 60) 
-    message_id = message.message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', int(future_time.timestamp()))
+    message.message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', int(future_time.timestamp()))
 
 def test_message_sendlater_wrongtime():
     other.clear()
@@ -220,5 +220,5 @@ def test_message_sendlater_wrongtime():
     current_time = datetime.utcnow()
     past_time = current_time - timedelta(seconds = 60) 
     with pytest.raises(InputError):
-        message_id = message.message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', int(past_time.timestamp()))
+        message.message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', int(past_time.timestamp()))
 

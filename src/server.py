@@ -225,14 +225,14 @@ def edit_message():
 def react_message():
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
-    user_react = message.message_react(decoded_jwt['token'], info['message_id'],  info['react_id'])
+    message.message_react(decoded_jwt['token'], info['message_id'],  info['react_id'])
     return dumps({})
 
 @APP.route("/message/unreact", methods=['POST'])
 def unreact_message():
     info = request.get_json()
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
-    user_unreact = message.message_unreact(decoded_jwt['token'], info['message_id'],  info['react_id'])
+    message.message_unreact(decoded_jwt['token'], info['message_id'],  info['react_id'])
     return dumps({})
 
 @APP.route("/message/sendlater", methods=['POST'])
