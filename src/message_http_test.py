@@ -904,8 +904,8 @@ def test_message_unpin_invalid_user(url):
     register_user1 = requests.post(url + "/auth/register", json=user1)
     payload_user1 = register_user1.json()
 
-    requests.post(url + "/auth/register", json=user2)
-    payload_user2 = register_user1.json()
+    register_user2 = requests.post(url + "/auth/register", json=user2)
+    payload_user2 = register_user2.json()
     #Create channel associated with user:
     test_channel_one_details = {
         'token': payload_user1['token'],
@@ -927,11 +927,12 @@ def test_message_unpin_invalid_user(url):
         'message_id' : result['message_id']
     }
     requests.post(url + "/message/pin", json=message_pin_inputs)
-    message_wrong_pin_inputs = {
-        'token' : payload_user2['token'],
+
+    message_wrong_unpin_inputs = {
+        'token' : payload_user2['token'] + 'aksldmlaskm',
         'message_id' : result['message_id']
     }
-    unpinned_message = requests.post(url + "/message/unpin", json=message_wrong_pin_inputs)
+    unpinned_message = requests.post(url + "/message/unpin", json=message_wrong_unpin_inputs)
 
     #fails because wrong user is trying to pin message with id message_id
     assert unpinned_message.status_code == 400

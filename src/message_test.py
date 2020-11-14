@@ -233,7 +233,6 @@ def test_message_pin_success():
     message.message_pin(user2_member['token'], message_id['message_id'])
     #assert that message pinned field is true
 
-
 def test_message_pin_invalid_message():
     other.clear()
     user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
