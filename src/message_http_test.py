@@ -887,25 +887,26 @@ def test_message_unpin_already_unpinned(url):
     #fails because InputError raised when already unpinned
     assert unpinned_message.status_code == 400
 
-def test_message_unpin_invalid_user(url):
+def test_message_unpin_not_member(url):
     user1 = {
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
         'name_last': 'user'
     }
+    # Register user:
+    register_user1 = requests.post(url + "/auth/register", json=user1)
+    payload_user1 = register_user1.json()
+
     user2 = {
         'email': 'tqwert@email.com',
         'password': 'passwoqwerrd123',
         'name_first': 'gladys',
         'name_last': 'berejik'
     }
-    # Register user:
-    register_user1 = requests.post(url + "/auth/register", json=user1)
-    payload_user1 = register_user1.json()
-
     register_user2 = requests.post(url + "/auth/register", json=user2)
     payload_user2 = register_user2.json()
+
     #Create channel associated with user:
     test_channel_one_details = {
         'token': payload_user1['token'],
@@ -920,6 +921,7 @@ def test_message_unpin_invalid_user(url):
         'message': 'Test Message Hello Hello'
     }
     send_message = requests.post(url + "/message/send", json=message_info)
+    assert send_message.status_code == 200
     result = send_message.json()
 
     message_pin_inputs = {
@@ -927,12 +929,11 @@ def test_message_unpin_invalid_user(url):
         'message_id' : result['message_id']
     }
     requests.post(url + "/message/pin", json=message_pin_inputs)
-
-    message_wrong_unpin_inputs = {
-        'token' : payload_user2['token'] + 'aksldmlaskm',
+    unpinned_message = requests.post(url + "/message/unpin", json={
+        'token' : payload_user2['token'],
         'message_id' : result['message_id']
-    }
-    unpinned_message = requests.post(url + "/message/unpin", json=message_wrong_unpin_inputs)
+    })
+    
 
-    #fails because wrong user is trying to pin message with id message_id
+    #fails because InputError raised when already unpinned
     assert unpinned_message.status_code == 400

@@ -189,7 +189,6 @@ def message_pin(token, message_id):
     }
 
 def message_unpin(token, message_id):
-    
     user_id = data.data['tokens'][token]
     #raise InputError when invalid message_id
     check_if_message_exists(message_id)
