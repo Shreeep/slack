@@ -744,6 +744,8 @@ def test_message_pin_success(url):
     }
     # Register user:
     register_user1 = requests.post(url + "/auth/register", json=user1)
+    assert register_user1.status_code == 200
+
     payload_user1 = register_user1.json()
 
     #Create channel associated with user:
@@ -753,6 +755,8 @@ def test_message_pin_success(url):
         'is_public': True 
     }
     create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
+    assert create_channel_one.status_code == 200
+    
     payload_channel_one = create_channel_one.json()
     message_info = {
         'token': payload_user1['token'],
@@ -760,6 +764,7 @@ def test_message_pin_success(url):
         'message': 'Test Message Hello Hello',
     }
     send_message = requests.post(url + "/message/send", json=message_info)
+    assert send_message.status_code == 200
     message = send_message.json()
 
     pinned_message = requests.post(url + "/message/pin", json={
