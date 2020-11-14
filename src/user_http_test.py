@@ -5,6 +5,7 @@ import re
 import signal
 import jwt
 import hashlib
+import data
 from subprocess import Popen, PIPE
 from time import sleep
 
@@ -307,14 +308,13 @@ def test_user_profile_upload_photo_status(url):
         'x_end': 415,
         'y_end': 311,
     }
-
-    requests.post(url + '/user/profile/uploadphoto/', json=photo_info)
+  
+    requests.post(url + '/user/profile/uploadphoto', json=photo_info)
 
     profile_img = f"{photo_info['img_url']}{photo_info['x_start']}{photo_info['y_start']}{photo_info['x_end']}{photo_info['y_end']}{encoded_jwt['u_id']}"
-
     profile_img = hashlib.sha256(profile_img.encode()).hexdigest()[:10] + '.jpg'
 
-    photo_status = requests.get(url + f'/static/{profile_img}')
+    photo = requests.get(url + f'/static/{profile_img}')
 
-    assert photo_status.status_code == 200
+    assert photo.status_code == 200
 
