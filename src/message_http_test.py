@@ -130,10 +130,18 @@ def test_delete_message_remove(url):
         'channel_id': payload_channel_one['channel_id'],
         'message': 'Oh no please remove this message'
     }
+
+
+    
     requests.post(url + "/message/send", json=message_one)
     accidental_message = requests.post(url + "/message/send", json=message_two)
     result = accidental_message.json()
-    deletion = requests.delete(url + "/message/remove", params={'token': payload_user1['token'], 'message_id': result['message_id']})
+
+    deletion_info = {
+        'token': payload_user1['token'], 
+        'message_id': result['message_id']
+    }
+    deletion = requests.delete(url + "/message/remove", json=deletion_info)
     assert deletion.status_code == 200
 
 def test_delete_message_remove_no_longer_exists(url):
@@ -749,18 +757,17 @@ def test_message_pin_success(url):
     message_info = {
         'token': payload_user1['token'],
         'channel_id': payload_channel_one['channel_id'],
-        'message': 'Test Message Hello Hello'
+        'message': 'Test Message Hello Hello',
     }
     send_message = requests.post(url + "/message/send", json=message_info)
-    result = send_message.json()
+    message = send_message.json()
 
-    message_pin_inputs = {
+    pinned_message = requests.post(url + "/message/pin", json={
         'token' : payload_user1['token'],
-        'message_id' : result['message_id']
-    }
-
-    pinned_message = requests.post(url + "/message/pin", json=message_pin_inputs)
+        'message_id' : message['message_id'],
+    })
     #success case
+
     assert pinned_message.status_code == 200
 
 def test_message_pin_already_pinned(url):

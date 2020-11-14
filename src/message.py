@@ -160,7 +160,6 @@ def message_sendlater(token, channel_id, message, time_sent):
     }   
 
 def message_pin(token, message_id):
-    
     user_id = data.data['tokens'][token]
     #raise InputError when invalid message_id
     check_if_message_exists(message_id)
@@ -170,20 +169,24 @@ def message_pin(token, message_id):
     for channel in data.data['channels']: 
         if channel_id == channel['id']:
             for messages in channel['messages']:
-                if messages['is_pinned'] == True: 
-                    raise InputError 
+                if messages['message_id'] == message_id:
+                    if messages['is_pinned'] == True: 
+                        raise InputError 
 
     #raise access error if user is not member of the channel or global owner
     for channel in data.data['channels']:
         if channel['id'] == channel_id:
             if not (any(user_id == member['u_id'] for member in channel['members']) or (data.data['users'][user_id]['is_global_owner'])):
                 raise AccessError
-
+    
     #change pinned value to true
     for channel in data.data['channels']: 
         if channel_id == channel['id']:
             for messages in channel['messages']:
-                messages['is_pinned'] = True 
+                if messages['message_id'] == message_id:
+                    messages['is_pinned'] = True 
+    return {
+    }
 
 def message_unpin(token, message_id):
     
@@ -196,8 +199,9 @@ def message_unpin(token, message_id):
     for channel in data.data['channels']: 
         if channel_id == channel['id']:
             for messages in channel['messages']:
-                if messages['is_pinned'] == False: 
-                    raise InputError 
+                if messages['message_id'] == message_id:
+                    if messages['is_pinned'] == False: 
+                        raise InputError
 
     #raise access error if user is not member of the channel or global owner
     for channel in data.data['channels']:
@@ -209,8 +213,10 @@ def message_unpin(token, message_id):
     for channel in data.data['channels']: 
         if channel_id == channel['id']:
             for messages in channel['messages']:
-                messages['is_pinned'] = False 
-
+                if messages['message_id'] == message_id:
+                    messages['is_pinned'] = False 
+    return {
+    }
     
 
 #Credit: Taken from channel.py - the file Shree and Vignaraj have worked on
