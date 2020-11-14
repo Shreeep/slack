@@ -46,9 +46,9 @@ def test_normal_use():
     other.clear()
     user1 = auth.auth_register('user13@gmail.com', '123abc!@#', 'Hayden', 'Everest')
     public_channel_id = channels.channels_create(user1['token'], "channel12", 1)['channel_id']
-    assert standup.standup_start(user1['token'], public_channel_id, 10)['time_finish'] == standup.standup_active(user1['token'], public_channel_id)['time_finish']
+    assert standup.standup_start(user1['token'], public_channel_id, 3)['time_finish'] == standup.standup_active(user1['token'], public_channel_id)['time_finish']
     assert standup.standup_active(user1['token'], public_channel_id)['is_active']
     standup.standup_send(user1['token'], public_channel_id, 'testt')
     standup.standup_send(user1['token'], public_channel_id, 'testt')
-    time.sleep(10)
+    time.sleep(3)
     assert not standup.standup_active(user1['token'], public_channel_id)['is_active']

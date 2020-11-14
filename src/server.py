@@ -303,9 +303,9 @@ def start():
 @APP.route("/standup/active", methods=['GET'])
 def active():
     token = request.args['token']
-    channel_id = request.args['channel_id']
+    channel_id = request.args.get('channel_id', default = 1, type = int)
     decoded_jwt = jwt.decode(token, data.jwt_secret, algorithm='HS256')
-    result = other.search(decoded_jwt['token'], channel_id)
+    result = standup.standup_active(decoded_jwt['token'], channel_id)
     return dumps(result)
 
 @APP.route("/standup/send", methods=['POST'])
@@ -313,7 +313,7 @@ def send():
     # get user info
     send_data = request.get_json()  
     decoded_jwt = jwt.decode(send_data['token'], data.jwt_secret, algorithm='HS256')
-    result = standup.standup_start(decoded_jwt['token'], send_data['channel_id'], send_data['message'])
+    result = standup.standup_send(decoded_jwt['token'], send_data['channel_id'], send_data['message'])
     return dumps(result)
 
 if __name__ == "__main__":
