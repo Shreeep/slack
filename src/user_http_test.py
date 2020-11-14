@@ -35,7 +35,8 @@ def test_user_profile(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -55,7 +56,7 @@ def test_user_profile(url):
     assert result['email'] == data_in['email']
     assert result['name_first'] == data_in['name_first']
     assert result['name_last'] == data_in['name_last']
-
+    assert result['profile_img_url'] == data_in['profile_img_url']
 
 def test_user_profile_setname(url):
     
@@ -64,7 +65,8 @@ def test_user_profile_setname(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -95,6 +97,7 @@ def test_user_profile_setname(url):
     assert result['email'] == data_in['email']
     assert result['name_first'] == info['name_first']
     assert result['name_last'] == info['name_last']
+    assert result['profile_img_url'] == data_in['profile_img_url']
 
 
 def test_user_profile_setemail(url):
@@ -104,7 +107,8 @@ def test_user_profile_setemail(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -133,6 +137,7 @@ def test_user_profile_setemail(url):
     assert result['email'] == info['email']
     assert result['name_first'] == data_in['name_first']
     assert result['name_last'] == data_in['name_last']
+    assert result['profile_img_url'] == data_in['profile_img_url']
 
 
 def test_user_profile_sethandle(url):
@@ -142,7 +147,8 @@ def test_user_profile_sethandle(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -172,6 +178,7 @@ def test_user_profile_sethandle(url):
     assert result['email'] == data_in['email']
     assert result['name_first'] == data_in['name_first']
     assert result['name_last'] == data_in['name_last']
+    assert result['profile_img_url'] == data_in['profile_img_url']
     assert result['handle_str'] == info['handle_str']
 
 
@@ -182,7 +189,8 @@ def test_user_profile_error(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -203,7 +211,8 @@ def test_user_profile_setname_error(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -229,7 +238,8 @@ def test_user_profile_setemail_error(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -254,7 +264,8 @@ def test_user_profile_sethandle_error(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
