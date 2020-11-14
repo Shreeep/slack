@@ -16,6 +16,7 @@ def test_user_profile():
         'name_first': 'test1',
         'name_last': 'user1',
         'handle_str': 'test1user1',
+        'profile_img_url': '',
     }
 
 
@@ -52,6 +53,7 @@ def test_user_profile_setname():
         'name_first': 'New',
         'name_last': 'UUSSSEEERRR',
         'handle_str': 'test1user1',
+        'profile_img_url': '',
     }
 
 
@@ -95,6 +97,7 @@ def test_user_profile_setemail():
         'name_first': 'test1',
         'name_last': 'user1',
         'handle_str': 'test1user1',
+        'profile_img_url': '',
     }
 
 
@@ -155,6 +158,7 @@ def test_user_profile_sethandle():
         'name_first': 'test1',
         'name_last': 'user1',
         'handle_str': 'thisisanewhandle',
+        'profile_img_url': '',
     }
 
 
