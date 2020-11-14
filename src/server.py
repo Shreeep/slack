@@ -26,7 +26,7 @@ def defaultHandler(err):
     response.content_type = 'application/json'
     return response
 
-APP = Flask(__name__)
+APP = Flask(__name__, static_url_path='/static/')
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -284,9 +284,7 @@ def user_profile_uploadphoto():
 
     user.user_profile_upload_photo(decoded_jwt['token'], info['img_url'], info['x_start'], info['y_start'], info['x_end'], info['y_end'])
 
-    # send_from_directory('', path)
-
-    return info['img_url']
+    return dumps({})
 
 
 @APP.route("/admin/userpermission/change", methods=['POST'])
@@ -309,6 +307,10 @@ def search():
 def clear():
     other.clear()
     return dumps({})
+
+@APP.route("/static/<path:path>")
+def send_img(path):
+    return send_from_directory('', path)
 
 if __name__ == "__main__":
     # APP.run(port=0) # Do not edit this port
