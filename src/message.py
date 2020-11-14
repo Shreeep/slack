@@ -159,6 +159,34 @@ def message_sendlater(token, channel_id, message, time_sent):
         'message_id': message_id,
     }   
 
+def message_pin(token, message_id):
+    
+    user_id = data.data['tokens'][token]
+    #raise InputError when invalid message_id
+    check_if_message_exists(message_id)
+    
+    #raise input error when already pinned
+    channel_id = check_which_channel_message_is_in(message_id)
+    for channel in data.data['channels']: 
+        if channel_id == channel['id']:
+            for messages in channel['messages']:
+                if messages['is_pinned'] == True: 
+                    raise InputError 
+
+    #raise access error if user is not member of the channel or global owner
+    for channel in data.data['channels']:
+        if channel['id'] == channel_id:
+            if not (any(user_id == member['u_id'] for member in channel['members']) or (data.data['users'][user_id]['is_global_owner'])):
+                raise AccessError
+
+    #change pinned value to true
+    for channel in data.data['channels']: 
+        if channel_id == channel['id']:
+            for messages in channel['messages']:
+                messages['is_pinned'] = True: 
+
+    
+
 #Credit: Taken from channel.py - the file Shree and Vignaraj have worked on
 #The function checks if the user is a member of the channel. 
 def check_if_valid_channel_and_member(channel_id, u_id):
@@ -206,3 +234,4 @@ def check_if_user_already_unreacted(channel_id, message_id, user_id):
                 if message_id == messages['message_id']:
                     if user_id not in messages['reacts'][0]['u_ids']:
                         raise InputError
+
