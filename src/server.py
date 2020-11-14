@@ -277,15 +277,13 @@ def set_handle():
     return dumps({})
 
 @APP.route("/user/profile/uploadphoto", methods=['POST'])
-def user_profile_uploadphoto():
+def user_profile_upload_photo():
     info = request.get_json()
-
+    # check token
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
-
+    # upload user profile and crop
     user.user_profile_upload_photo(decoded_jwt['token'], info['img_url'], info['x_start'], info['y_start'], info['x_end'], info['y_end'])
-
-    return dumps({})
-
+    return ({})
 
 @APP.route("/admin/userpermission/change", methods=['POST'])
 def change():
@@ -313,7 +311,7 @@ def send_img(path):
     return send_from_directory('', path)
 
 if __name__ == "__main__":
-    # APP.run(port=0) # Do not edit this port
-    APP.run(port=1337) # Do not edit this port
+    APP.run(port=0) # Do not edit this port
+
 
 

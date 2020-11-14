@@ -4,6 +4,7 @@ import pytest
 import re
 import signal
 import jwt
+import hashlib
 from subprocess import Popen, PIPE
 from time import sleep
 
@@ -281,3 +282,39 @@ def test_user_profile_sethandle_error(url):
     r = requests.put(url + "/user/profile/sethandle", json=info)
 
     assert r.status_code == 400
+
+
+def test_user_profile_upload_photo_status(url):
+    
+    # user info
+    data_in = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user',
+        'profile_img_url': ''
+    }
+
+    # register user
+    r = requests.post(url + "/auth/register", json=data_in)
+    encoded_jwt = r.json()
+
+    photo_info = {
+        'token': encoded_jwt['token'],
+        'img_url': 'https://www.courant.com/resizer/D9qmAnzR8PY5q-GBdUBBVuNVUTs=/415x311/top/arc-anglerfish-arc2-prod-tronc.s3.amazonaws.com/public/NTWCZKYTDJBI7CASRJ32F2RN6E.jpg',
+        'x_start': 0,
+        'y_start': 0,
+        'x_end': 415,
+        'y_end': 311,
+    }
+
+    requests.post(url + '/user/profile/uploadphoto/', json=photo_info)
+
+    profile_img = f"{photo_info['img_url']}{photo_info['x_start']}{photo_info['y_start']}{photo_info['x_end']}{photo_info['y_end']}{encoded_jwt['u_id']}"
+
+    profile_img = hashlib.sha256(profile_img.encode()).hexdigest()[:10] + '.jpg'
+
+    photo_status = requests.get(url + f'/static/{profile_img}')
+
+    assert photo_status.status_code == 200
+
