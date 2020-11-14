@@ -1,6 +1,6 @@
 import sys
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from error import InputError
 import auth
@@ -275,6 +275,19 @@ def set_handle():
     decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
     user.user_profile_sethandle(decoded_jwt['token'], info['handle_str'])
     return dumps({})
+
+@APP.route("/user/profile/uploadphoto", methods=['POST'])
+def user_profile_uploadphoto():
+    info = request.get_json()
+
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+
+    user.user_profile_upload_photo(decoded_jwt['token'], info['img_url'], info['x_start'], info['y_start'], info['x_end'], info['y_end'])
+
+    # send_from_directory('', path)
+
+    return info['img_url']
+
 
 @APP.route("/admin/userpermission/change", methods=['POST'])
 def change():

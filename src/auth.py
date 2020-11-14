@@ -81,6 +81,7 @@ def auth_register(email, password, name_first, name_last):
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle,
+        'profile_img_url': '',
         'is_global_owner': is_global_owner
     }
 
