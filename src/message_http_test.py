@@ -875,7 +875,7 @@ def test_message_unpin_already_unpinned(url):
     #fails because InputError raised when already unpinned
     assert unpinned_message.status_code == 400
 
-def test_message_unpin_already_unpinned(url):
+def test_message_unpin_invalid_user(url):
     user1 = {
         'email': 'test@email.com',
         'password': 'password123',
