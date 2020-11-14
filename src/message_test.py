@@ -222,3 +222,53 @@ def test_message_sendlater_wrongtime():
     with pytest.raises(InputError):
         message.message_sendlater(user1['token'], test_channel['channel_id'], 'Send this message later, cya', int(past_time.timestamp()))
 
+def test_message_pin_success():
+    other.clear()
+    user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
+    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
+    #message is pinned
+    message.message_pin(user1['token'], message_id['message_id'])
+
+def test_message_pin_invalid_message():
+    other.clear()
+    user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
+    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
+    #message is pinned
+    with pytest.raises(InputError):
+        message.message_pin(user1['token'], 99)
+
+
+def test_message_pin_already_pinned():
+    other.clear()
+    user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
+    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
+    #message is pinned
+    message.message_pin(user1['token'], message_id['message_id'])
+
+    with pytest.raises(InputError):
+        message.message_pin(user1['token'], message_id['message_id'])
+
+def test_message_pin_not_member():
+    other.clear()
+    user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
+    user2 = auth.auth_register('another@mail.com', 'easypewpew9', 'Sam', 'Keating')
+
+    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
+
+    with pytest.raises(AccessError):
+        message.message_pin(user2['token'], message_id['message_id'])    
+
+def test_message_pin_not_authorised():
+    other.clear()
+    user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
+    user2 = auth.auth_register('another@mail.com', 'easypewpew9', 'Sam', 'Keating')
+
+    test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
+    message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
+
+    with pytest.raises(AccessError):
+        message.message_pin(user2['token'], message_id['message_id'])    
