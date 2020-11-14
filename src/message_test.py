@@ -27,7 +27,8 @@ def test_message_send():
                     'u_ids':[],
                     'is_this_user_reacted': False,
                 },
-        ], 
+        ],
+        'is_pinned' : False 
     }
 
 #Black Box: 
@@ -230,6 +231,19 @@ def test_message_pin_success():
     #message is pinned
     message.message_pin(user1['token'], message_id['message_id'])
     #assert that message pinned field is true
+    assert data.data['channels'][0]['messages'][0] == {
+        'message_id': message_id['message_id'],
+        'u_id': user1['u_id'],
+        'message': 'Random Message String asdasdsadas',
+        'time_created': data.data['channels'][0]['messages'][0]['time_created'],
+        'reacts':[{ 
+                    'react_id': 0,
+                    'u_ids':[],
+                    'is_this_user_reacted': False,
+                },
+        ],
+        'is_pinned' : True 
+    }
 
 def test_message_pin_invalid_message():
     other.clear()
@@ -287,7 +301,7 @@ def test_message_unpin_invalid_message():
     other.clear()
     user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
     test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
-    message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
+    message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
     #message is pinned
     message.message_pin(user1['token'], message_id['message_id'])
     with pytest.raises(InputError):
