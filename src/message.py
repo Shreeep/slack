@@ -57,6 +57,7 @@ def message_remove(token, message_id):
                     channel['messages'].remove(message)
                 else: #If neither of the above statements are True, the user is not authorised to remove the message
                     raise AccessError
+                break
     return {}
     
 def message_edit(token, message_id, message):
@@ -100,7 +101,7 @@ def message_react(token, message_id, react_id):
     return {}
     
 def message_unreact(token, message_id, react_id):
-    if (react_id != 0):
+    if (react_id != 1):
         raise InputError
     user_id = data.data['tokens'][token]
     #Check if given message_id is valid - if not, raise InputError
