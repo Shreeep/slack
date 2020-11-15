@@ -202,8 +202,42 @@ def test_upload_photo_status():
 
 def test_upload_photo_not_jpg():
     clear()
-    auth.auth_register('test@email.com', 'password', 'test', 'user')
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    login1 = auth.auth_login('comp1531testuser@gmail.com', 'password')
+    with pytest.raises(InputError):
+        user.user_profile_upload_photo(login1['token'], 'img.png', 0, 0, 50, 50)
 
-    with pytest.raises(AccessError):
-        user.user_profile_upload_photo('invalidtoken', 'img.png', 0, 0, 50, 50)
+def test_upload_photo_success():
+    clear()
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    login1 = auth.auth_login('comp1531testuser@gmail.com', 'password')
+    user.user_profile_upload_photo(login1['token'], 'https://upload.wikimedia.org/wikipedia/en/9/95/Test_image.jpg', 50, 50, 100, 100)
+    
+def test_upload_photo_x_too_small():
+    clear()
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    login1 = auth.auth_login('comp1531testuser@gmail.com', 'password')
+    with pytest.raises(InputError):
+        user.user_profile_upload_photo(login1['token'], 'https://upload.wikimedia.org/wikipedia/en/9/95/Test_image.jpg', -5, 50, 100, 100)
+        
+def test_upload_photo_y_too_small():
+    clear()
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    login1 = auth.auth_login('comp1531testuser@gmail.com', 'password')
+    with pytest.raises(InputError):
+        user.user_profile_upload_photo(login1['token'], 'https://upload.wikimedia.org/wikipedia/en/9/95/Test_image.jpg', 5, -50, 100, 100)
 
+def test_upload_photo_x_end_too_small():
+    clear()
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    login1 = auth.auth_login('comp1531testuser@gmail.com', 'password')
+    with pytest.raises(InputError):
+        user.user_profile_upload_photo(login1['token'], 'https://upload.wikimedia.org/wikipedia/en/9/95/Test_image.jpg', 5, 50, -100, 100)
+      
+def test_upload_photo_y_end_too_small():
+    clear()
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    login1 = auth.auth_login('comp1531testuser@gmail.com', 'password')
+    with pytest.raises(InputError):
+        user.user_profile_upload_photo(login1['token'], 'https://upload.wikimedia.org/wikipedia/en/9/95/Test_image.jpg', 5, 50, 100, -100)
+                          
