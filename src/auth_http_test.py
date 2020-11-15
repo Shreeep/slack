@@ -4,6 +4,7 @@ import pytest
 import re
 import signal
 import jwt
+import hashlib
 from subprocess import Popen, PIPE
 from time import sleep
 
@@ -97,7 +98,6 @@ def test_post_login(url):
     login_data = {
         'email': 'test@email.com',
         'password': 'password123',
-
     }
 
     # logging in
@@ -239,14 +239,12 @@ def test_post_login_multiple(url):
     login_data = {
         'email': 'test@email.com',
         'password': 'password123',
-
     }
 
     # user login info 2
     login_data2 = {
         'email': 'test2@email.com',
         'password': 'password123456',
-
     }
 
     # login user 1
@@ -311,10 +309,100 @@ def test_post_login_errors(url):
     login_data = {
         'email': 'test@email.com',
         'password': 'password',
-
     }
 
     # logging in
+    r = requests.post(url + "/auth/login", json=login_data)
+
+    assert r.status_code == 400
+
+def test_post_passwordreset_success(url):
+    
+    # user info 1
+    dataIn = {
+        'email': 'comp1531testuser@gmail.com',
+        'password': 'password',
+        'name_first': 'test',
+        'name_last': 'user',
+    }
+
+    # register and login
+    r = requests.post(url + "/auth/register", json=dataIn)
+    encoded_jwt = r.json()
+
+    # logout user
+    r = requests.post(url + "/auth/logout", json=encoded_jwt)
+
+    email = {
+        'email': 'comp1531testuser@gmail.com',
+    }
+
+    # request password reset code
+    requests.post(url + "/auth/passwordreset/request", json=email)
+
+    # hashing reset code
+    # hashed reset code received from email
+    reset_info = {
+        'reset_code': '4c03c351661dbda22dc77db9b055bb3ae3c54f0bacee573c957f2f012ca55924',
+        'new_password': 'password123',
+    }
+
+    # resetting password
+    requests.post(url + "/auth/passwordreset/reset", json=reset_info)
+
+    new_login = {
+        'email': 'comp1531testuser@gmail.com',
+        'password': 'password123'
+    }
+
+    # logging in with new password
+    r = requests.post(url + "/auth/login", json=new_login)
+    encoded_jwt = r.json()
+
+    # checking correct user
+    r = requests.get(url + "/users/all", params={'token': encoded_jwt['token']})
+    result = r.json()
+
+    user = result['users'][0]
+    
+    assert user['email'] == dataIn['email']
+    assert user['name_first'] == dataIn['name_first']
+    assert user['name_last'] == dataIn['name_last']
+
+
+def test_post_passwordreset_fail(url):
+    # user info 1
+    dataIn = {
+        'email': 'comp1531testuser@gmail.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+
+    # register and login user
+    r = requests.post(url + "/auth/register", json=dataIn)
+    encoded_jwt = r.json()
+
+    # log out with token
+    r = requests.post(url + "/auth/logout", json=encoded_jwt)
+
+    # request password reset code
+    requests.post(url + "/auth/passwordreset/request", json=dataIn['email'])
+
+    reset_info = {
+        'reset_code': 'comp1531testuser@gmail.compassword',
+        'new_password': 'ThisNewPASSWORD'
+    }
+
+    # reset the password
+    requests.post(url + "/auth/passwordreset/reset", json=reset_info)
+
+    login_data = {
+        'email': 'comp1531testuser@gmail.com',
+        'password': 'ThisNewPASSWORD',
+    }
+
+    # login with the new password
     r = requests.post(url + "/auth/login", json=login_data)
 
     assert r.status_code == 400

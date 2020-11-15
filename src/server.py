@@ -1,6 +1,6 @@
 import sys
 from json import dumps
-from flask import Flask, request
+from flask import Flask, request, send_from_directory
 from flask_cors import CORS
 from error import InputError
 import auth
@@ -26,7 +26,7 @@ def defaultHandler(err):
     response.content_type = 'application/json'
     return response
 
-APP = Flask(__name__)
+APP = Flask(__name__, static_url_path='/static/')
 CORS(APP)
 
 APP.config['TRAP_HTTP_EXCEPTIONS'] = True
@@ -97,6 +97,32 @@ def logout():
     is_success = auth.auth_logout(decoded_jwt['token'])
 
     return dumps(is_success)
+
+
+@APP.route("/auth/passwordreset/request", methods=['POST'])
+def auth_passwordreset_request():
+
+    # get user info
+    user_info = request.get_json()
+
+    # request reset code
+    auth.auth_passwordreset_request(user_info['email'])
+
+    return dumps({})
+
+
+@APP.route("/auth/passwordreset/reset", methods=['POST'])
+def auth_passwordreset_reset():
+
+    # get user info
+    user_info = request.get_json()
+
+    # reset password
+    hashpw = hashlib.sha256(user_info['new_password'].encode()).hexdigest()
+    auth.auth_passwordreset_reset(user_info['reset_code'], hashpw)
+
+    return dumps({})
+
 
 @APP.route("/users/all", methods=['GET'])
 def users_all():
@@ -271,6 +297,15 @@ def set_handle():
     user.user_profile_sethandle(decoded_jwt['token'], info['handle_str'])
     return dumps({})
 
+@APP.route("/user/profile/uploadphoto", methods=['POST'])
+def user_profile_upload_photo():
+    info = request.get_json()
+    # check token
+    decoded_jwt = jwt.decode(info['token'], data.jwt_secret, algorithm='HS256')
+    # upload user profile and crop
+    user.user_profile_upload_photo(decoded_jwt['token'], info['img_url'], info['x_start'], info['y_start'], info['x_end'], info['y_end'])
+    return dumps({})
+
 @APP.route("/admin/userpermission/change", methods=['POST'])
 def change():
     # get the info
@@ -291,6 +326,10 @@ def search():
 def clear():
     other.clear()
     return dumps({})
+
+@APP.route("/static/<path:path>")
+def send_img(path):
+    return send_from_directory('', path)
 
 @APP.route("/standup/start", methods=['POST'])
 def start():
@@ -318,5 +357,4 @@ def send():
 
 if __name__ == "__main__":
     APP.run(port=0) # Do not edit this port
-
 

@@ -1,5 +1,9 @@
 import re
 import data
+import hashlib
+import smtplib, ssl
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from error import InputError, AccessError
 
 
@@ -77,6 +81,7 @@ def auth_register(email, password, name_first, name_last):
         'name_first': name_first,
         'name_last': name_last,
         'handle_str': handle,
+        'profile_img_url': '',
         'is_global_owner': is_global_owner
     }
 
@@ -118,3 +123,58 @@ def auth_register(email, password, name_first, name_last):
     data.token_id += 1
 
     return ret
+
+
+def auth_passwordreset_request(email):
+
+    # Checking if valid email
+    if not re.search(data.EMAIL_REGEX,email):
+        raise InputError
+
+    all_users = data.data['users'].values()
+
+    # check the entered email is an email saved in the data
+    for user in all_users:
+        if email == user['email']:
+            
+            # generate reset code
+            reset_code = hashlib.sha256(str(user['email'] + user['password']).encode()).hexdigest()
+
+            # storing reset code
+            data.data['reset_code'][reset_code] = user['u_id']
+
+            # sending email
+            port = 465
+
+            msg_info = MIMEMultipart()
+
+            # message sent
+            msg_info['From'] = "comp1531testuser@gmail.com"
+            msg_info['To'] = email
+            msg_info['Subject'] = 'Flockr password reset code'
+            message = 'Here is your reset code. \n' + reset_code
+
+            msg_info.attach(MIMEText(message, 'plain'))
+
+            smtp_server = "smtp.gmail.com"
+            password = 'C0MP1531T3stus3r'
+
+            context = ssl.create_default_context()
+            with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+                server.login(msg_info['From'], password)
+                server.sendmail(msg_info['From'], msg_info['To'], msg_info.as_string())
+
+  
+def auth_passwordreset_reset(reset_code, new_password):
+
+    if len(new_password) < data.MIN_PW_LEN:
+        raise InputError
+
+    if reset_code in data.data['reset_code']:
+        u_id = data.data['reset_code'][reset_code]
+        data.data['users'][u_id]['password'] = new_password
+        data.data['reset_code'].pop(reset_code)
+
+    else:
+        raise InputError
+

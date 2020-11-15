@@ -1,5 +1,10 @@
 import data
 import re
+import copy
+import urllib.request
+import os
+import hashlib
+from PIL import Image
 from error import InputError, AccessError
 
 
@@ -17,7 +22,8 @@ def user_profile(token, u_id):
         raise AccessError
 
     u_id = data.data['tokens'][token]
-    profile = data.data['users'][u_id]
+
+    profile = copy.deepcopy(data.data['users'][u_id])
 
     profile.pop('password')
     profile.pop('is_global_owner')
@@ -91,8 +97,56 @@ def user_profile_sethandle(token, handle_str):
     profile['handle_str'] = handle_str
     data.data['handles'][handle_str] = True
 
-    return {}   
+    return {
+    }   
 
 
+def user_profile_upload_photo(token, img_url, x_start, y_start, x_end, y_end):
+  
+    # create folder called if not found
+    if os.path.exists('src/static') is False:
+        os.mkdir('src/static')
 
+    # checking for valid token
+    if token not in data.data['tokens']:
+        raise AccessError
 
+    u_id = data.data['tokens'][token]
+
+    # check img is a jpg
+    if '.jpg' not in img_url:
+        raise InputError
+
+    # generating unique image url
+    profile_img = f'{img_url}{x_start}{y_start}{x_end}{y_end}{u_id}'
+    profile_img = hashlib.sha256(profile_img.encode()).hexdigest()[:10]
+
+    # get img and open it
+    try:
+        urllib.request.urlretrieve(img_url, f'src/static/{profile_img}.jpg')
+    except urllib.error.HTTPError:
+        raise InputError
+
+    img = Image.open(f'src/static/{profile_img}.jpg')
+
+    # crop image
+    cropped = img.crop((x_start, y_start, x_end, y_end))
+
+    # check crop size is within image
+    if x_start < 0 or x_start > img.size[0]:
+        raise InputError
+
+    if y_start < 0 or y_start > img.size[1]:
+        raise InputError
+
+    if x_end < 0 or x_end > img.size[0]:
+        raise InputError
+
+    if y_end < 0 or y_end > img.size[1]:
+        raise InputError
+
+    # save img in the folder
+    cropped.save(f'src/static/{profile_img}.jpg')
+
+    # saving the image url to the user profile
+    data.data['users'][u_id]['profile_img_url'] = f'{profile_img}.jpg'

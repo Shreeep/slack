@@ -16,6 +16,7 @@ def test_user_profile():
         'name_first': 'test1',
         'name_last': 'user1',
         'handle_str': 'test1user1',
+        'profile_img_url': '',
     }
 
 
@@ -52,6 +53,7 @@ def test_user_profile_setname():
         'name_first': 'New',
         'name_last': 'UUSSSEEERRR',
         'handle_str': 'test1user1',
+        'profile_img_url': '',
     }
 
 
@@ -95,6 +97,7 @@ def test_user_profile_setemail():
         'name_first': 'test1',
         'name_last': 'user1',
         'handle_str': 'test1user1',
+        'profile_img_url': '',
     }
 
 
@@ -155,6 +158,7 @@ def test_user_profile_sethandle():
         'name_first': 'test1',
         'name_last': 'user1',
         'handle_str': 'thisisanewhandle',
+        'profile_img_url': '',
     }
 
 
@@ -178,3 +182,28 @@ def test_user_profile_sethandle_errors():
 
     with pytest.raises(AccessError):
         user.user_profile_sethandle('nbidsovno', 'testuser')
+
+
+def test_upload_photo_invalid_token():
+    clear()
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
+
+    with pytest.raises(AccessError):
+        user.user_profile_upload_photo('invalidtoken', 'https://www.courant.com/resizer/D9qmAnzR8PY5q-GBdUBBVuNVUTs=/415x311/top/arc-anglerfish-arc2-prod-tronc.s3.amazonaws.com/public/NTWCZKYTDJBI7CASRJ32F2RN6E.jpg', 0, 0, 50, 50)
+
+
+def test_upload_photo_status():
+    clear()
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
+
+    with pytest.raises(AccessError):
+        user.user_profile_upload_photo('invalidtoken', 'img.jpg', 0, 0, 50, 50)
+
+
+def test_upload_photo_not_jpg():
+    clear()
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
+
+    with pytest.raises(AccessError):
+        user.user_profile_upload_photo('invalidtoken', 'img.png', 0, 0, 50, 50)
+

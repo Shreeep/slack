@@ -101,9 +101,53 @@ def test_logout_success():
 
 def test_logout_fail():
     clear()
+    auth.auth_register('test@email.com', 'password', 'test', 'user')
     with pytest.raises(AccessError):
-        auth.auth_register('test@email.com', 'password', 'test', 'user')
         auth.auth_logout('invalidtoken')
 
 
+def test_passwordreset_success():
+    clear()
+    register1 = auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('comp1531testuser@gmail.com')
+    auth.auth_passwordreset_reset('d9515429f13ac55be806a691b61ce0a3f505d97517ae22da7e22f2f6bd92f986', 'newpassword')
+
+    login1 = auth.auth_login('comp1531testuser@gmail.com', 'newpassword')
+    
+    assert login1['u_id'] == register1['u_id']
+
+
+def test_passwordreset_old_pw_fail():
+    clear()
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('comp1531testuser@gmail.com')
+    auth.auth_passwordreset_reset('d9515429f13ac55be806a691b61ce0a3f505d97517ae22da7e22f2f6bd92f986', 'newpassword')
+
+    with pytest.raises(InputError):
+        auth.auth_login('comp1531testuser@gmail.com', 'password')
+
+def test_passwordreset_invalid_email():
+    clear()
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+   
+    with pytest.raises(InputError):
+        auth.auth_passwordreset_request('test2email.com')
+
+
+def test_passwordreset_invalid_code():
+    clear()
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('comp1531testuser@gmail.com')
+
+    with pytest.raises(InputError):
+        auth.auth_passwordreset_reset('', 'newpassword')
+
+
+def test_passwordreset_invalid_password():
+    clear()
+    auth.auth_register('comp1531testuser@gmail.com', 'password', 'test', 'user')
+    auth.auth_passwordreset_request('comp1531testuser@gmail.com')
+
+    with pytest.raises(InputError):
+        auth.auth_passwordreset_reset('comp1531testuser@gmail.compassword', '')    
 

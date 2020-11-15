@@ -4,6 +4,8 @@ import pytest
 import re
 import signal
 import jwt
+import hashlib
+import data
 from subprocess import Popen, PIPE
 from time import sleep
 
@@ -35,7 +37,8 @@ def test_user_profile(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -55,7 +58,7 @@ def test_user_profile(url):
     assert result['email'] == data_in['email']
     assert result['name_first'] == data_in['name_first']
     assert result['name_last'] == data_in['name_last']
-
+    assert result['profile_img_url'] == data_in['profile_img_url']
 
 def test_user_profile_setname(url):
     
@@ -64,7 +67,8 @@ def test_user_profile_setname(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -95,6 +99,7 @@ def test_user_profile_setname(url):
     assert result['email'] == data_in['email']
     assert result['name_first'] == info['name_first']
     assert result['name_last'] == info['name_last']
+    assert result['profile_img_url'] == data_in['profile_img_url']
 
 
 def test_user_profile_setemail(url):
@@ -104,7 +109,8 @@ def test_user_profile_setemail(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -133,6 +139,7 @@ def test_user_profile_setemail(url):
     assert result['email'] == info['email']
     assert result['name_first'] == data_in['name_first']
     assert result['name_last'] == data_in['name_last']
+    assert result['profile_img_url'] == data_in['profile_img_url']
 
 
 def test_user_profile_sethandle(url):
@@ -142,7 +149,8 @@ def test_user_profile_sethandle(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -172,6 +180,7 @@ def test_user_profile_sethandle(url):
     assert result['email'] == data_in['email']
     assert result['name_first'] == data_in['name_first']
     assert result['name_last'] == data_in['name_last']
+    assert result['profile_img_url'] == data_in['profile_img_url']
     assert result['handle_str'] == info['handle_str']
 
 
@@ -182,7 +191,8 @@ def test_user_profile_error(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -203,7 +213,8 @@ def test_user_profile_setname_error(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -229,7 +240,8 @@ def test_user_profile_setemail_error(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -254,7 +266,8 @@ def test_user_profile_sethandle_error(url):
         'email': 'test@email.com',
         'password': 'password123',
         'name_first': 'test',
-        'name_last': 'user'
+        'name_last': 'user',
+        'profile_img_url': ''
     }
 
     # register user
@@ -270,3 +283,38 @@ def test_user_profile_sethandle_error(url):
     r = requests.put(url + "/user/profile/sethandle", json=info)
 
     assert r.status_code == 400
+
+
+def test_user_profile_upload_photo_status(url):
+    
+    # user info
+    data_in = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user',
+        'profile_img_url': ''
+    }
+
+    # register user
+    r = requests.post(url + "/auth/register", json=data_in)
+    encoded_jwt = r.json()
+
+    photo_info = {
+        'token': encoded_jwt['token'],
+        'img_url': 'https://www.courant.com/resizer/D9qmAnzR8PY5q-GBdUBBVuNVUTs=/415x311/top/arc-anglerfish-arc2-prod-tronc.s3.amazonaws.com/public/NTWCZKYTDJBI7CASRJ32F2RN6E.jpg',
+        'x_start': 0,
+        'y_start': 0,
+        'x_end': 415,
+        'y_end': 311,
+    }
+  
+    requests.post(url + '/user/profile/uploadphoto', json=photo_info)
+
+    profile_img = f"{photo_info['img_url']}{photo_info['x_start']}{photo_info['y_start']}{photo_info['x_end']}{photo_info['y_end']}{encoded_jwt['u_id']}"
+    profile_img = hashlib.sha256(profile_img.encode()).hexdigest()[:10] + '.jpg'
+
+    photo = requests.get(url + f'/static/{profile_img}')
+
+    assert photo.status_code == 200
+
