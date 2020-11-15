@@ -582,7 +582,7 @@ def test_post_message_unreact(url):
     send_message = requests.post(url + "/message/send", json=message_info)
     result = send_message.json()
     requests.post(url + "/message/react", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 1})
-    successful_unreact = requests.post(url + "/message/unreact", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 0})
+    successful_unreact = requests.post(url + "/message/unreact", json={'token':payload_user1['token'], 'message_id': result['message_id'], 'react_id': 1})
     assert successful_unreact.status_code == 200
 
 def test_post_message_unreact_invalid_message_id(url):

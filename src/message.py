@@ -50,12 +50,14 @@ def message_remove(token, message_id):
     user_id = data.data['tokens'][token]
     for channel in data.data['channels']:
         for message in channel['messages']:
-            if message_id == message['message_id'] and user_id == message['u_id']: 
-                channel['messages'].remove(message)
-            elif check_if_user_is_owner(channel['id'], user_id) is True:
-                channel['messages'].remove(message)
-            else: #If neither of the above statements are True, the user is not authorised to remove the message
-                raise AccessError
+            if message_id == message['message_id']:
+                if user_id == message['u_id']: 
+                    channel['messages'].remove(message)
+                elif check_if_user_is_owner(channel['id'], user_id) is True:
+                    channel['messages'].remove(message)
+                else: #If neither of the above statements are True, the user is not authorised to remove the message
+                    raise AccessError
+                break
     return {}
     
 def message_edit(token, message_id, message):
@@ -67,12 +69,13 @@ def message_edit(token, message_id, message):
     user_id = data.data['tokens'][token]
     for channel in data.data['channels']:
         for messages in channel['messages']:
-            if message_id == messages['message_id'] and user_id == messages['u_id']:
-                messages['message'] = message
-            elif check_if_user_is_owner(channel['id'], user_id) is True:
-                messages['message'] = message
-            else: #User is not authorised to edit the message
-                raise AccessError
+            if message_id == messages['message_id']:
+                if user_id == messages['u_id']:
+                    messages['message'] = message
+                elif check_if_user_is_owner(channel['id'], user_id) is True:
+                    messages['message'] = message
+                else: #User is not authorised to edit the message
+                    raise AccessError
     return {}
 
 def message_react(token, message_id, react_id):
@@ -98,7 +101,7 @@ def message_react(token, message_id, react_id):
     return {}
     
 def message_unreact(token, message_id, react_id):
-    if (react_id != 0):
+    if (react_id != 1):
         raise InputError
     user_id = data.data['tokens'][token]
     #Check if given message_id is valid - if not, raise InputError

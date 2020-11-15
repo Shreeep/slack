@@ -17,6 +17,7 @@ def channels_list(token):
         'u_id': user_id,
         'name_first': data.data['users'][user_id]['name_first'],
         'name_last': data.data['users'][user_id]['name_last'],
+        'profile_img_url': data.data['users'][user_id]['profile_img_url']
     }
     
 
@@ -72,6 +73,7 @@ def channels_create(token, name, is_public):
     channel_owner_user_id = data.data['tokens'][token]
     channel_owner_name_first = data.data['users'][channel_owner_user_id]['name_first']
     channel_owner_name_last = data.data['users'][channel_owner_user_id]['name_last']
+    channel_owner_profile_img_url = data.data['users'][channel_owner_user_id]['profile_img_url']
 
     #Initialisation of new channel with its name and is_public bool
     new_channel = {
@@ -91,6 +93,7 @@ def channels_create(token, name, is_public):
         'u_id': channel_owner_user_id,
         'name_first': channel_owner_name_first,
         'name_last': channel_owner_name_last,
+        'profile_img_url': channel_owner_profile_img_url,
     }
 
     new_channel['members'].append(owner_details)

@@ -81,6 +81,7 @@ def test_channel_details_success_two_users():
                 'u_id': user1['u_id'],
                 'name_first': 'Hayden',
                 'name_last': 'Everest',
+                'profile_img_url': '',
             },
         ],
         'all_members': [
@@ -88,11 +89,13 @@ def test_channel_details_success_two_users():
                 'u_id': user1['u_id'],
                 'name_first': 'Hayden',
                 'name_last': 'Everest',
+                'profile_img_url': '',
             },
             {
                 'u_id': user2['u_id'],
                 'name_first': 'Bowen',
                 'name_last': 'Pierce',
+                'profile_img_url': '',
             }
         ],
     }
@@ -280,11 +283,13 @@ def test_channel_join_success_private():
             'u_id': user2['u_id'],
             'name_first': 'ree',
             'name_last': 'Path',
+            'profile_img_url': '',
         },
         {
             'u_id': user1['u_id'],
             'name_first': 'Shree',
             'name_last': 'Nath',
+            'profile_img_url': '',
         }
     ]
 
@@ -342,11 +347,13 @@ def test_channel_addowner_global_owner_success():
             'u_id': user2['u_id'],
             'name_first': 'Aeep',
             'name_last': 'Path',
+            'profile_img_url': '',
         },
         {
             'u_id': user3['u_id'],
             'name_first': 'Aeeree',
             'name_last': 'Bath',
+            'profile_img_url': '',
         },
     ]
 
@@ -364,11 +371,13 @@ def test_channel_addowner_channel_owner_success():
             'u_id': user2['u_id'],
             'name_first': 'Aeep',
             'name_last': 'Path',
+            'profile_img_url': '',
         },
         {
             'u_id': user3['u_id'],
             'name_first': 'Aeeree',
             'name_last': 'Bath',
+            'profile_img_url': '',
         },
     ]
 
@@ -415,6 +424,7 @@ def test_channel_removeowner_success_channel_owner():
             'u_id': user1['u_id'],
             'name_first': 'Shree',
             'name_last': 'Nath',
+            'profile_img_url': '',
         }
     ]
 
@@ -432,6 +442,7 @@ def test_channel_removeowner_success_global_owner():
             'u_id': user2['u_id'],
             'name_first': 'Aeep',
             'name_last': 'Path',
+            'profile_img_url': '',
         }
     ]
 
