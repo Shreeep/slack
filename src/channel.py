@@ -18,6 +18,7 @@ def channel_invite(token, channel_id, u_id):
         'u_id': u_id,
         'name_first': target_user['name_first'],
         'name_last': target_user['name_last'],
+        'profile_img_url': target_user['profile_img_url'],
     }
     # add member to channel if he is already not there
     all_channels = data.data['channels']
@@ -133,6 +134,7 @@ def channel_join(token, channel_id):
     auth_user_id = data.data['tokens'][token]
     name_first = data.data['users'][auth_user_id]['name_first']
     name_last = data.data['users'][auth_user_id]['name_last']
+    profile_img_url = data.data['users'][auth_user_id]['profile_img_url']
 
     #input error if channel_id is not a valid channel
     if not any(channel['id'] == channel_id for channel in data.data['channels']):
@@ -151,7 +153,8 @@ def channel_join(token, channel_id):
     new_member = {
         'u_id' : auth_user_id,
         'name_first': name_first,
-        'name_last': name_last
+        'name_last': name_last,
+        'profile_img_url': profile_img_url,
     }
 
     #searching for the correct channel
@@ -189,11 +192,13 @@ def channel_addowner(token, channel_id, u_id):
 
     name_first = data.data['users'][u_id]['name_first']
     name_last = data.data['users'][u_id]['name_last']
+    profile_img_url = data.data['users'][u_id]['profile_img_url']
 
     new_owner = {
         'u_id' : u_id,
         'name_first': name_first,
-        'name_last': name_last
+        'name_last': name_last,
+        'profile_img_url': profile_img_url,
     }
     ## TODO: if user wasn't previously a member, add them as a member
     for channel in data.data['channels']:

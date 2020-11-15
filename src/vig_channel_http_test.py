@@ -129,6 +129,7 @@ def test_get_details(url):
                 'u_id': user_1['u_id'],
                 'name_first': 'test',
                 'name_last': 'user',
+                'profile_img_url': '',
             },
         ],
         'all_members': [
@@ -136,6 +137,7 @@ def test_get_details(url):
                 'u_id': user_1['u_id'],
                 'name_first': 'test',
                 'name_last': 'user',
+                'profile_img_url': '',
             },
         ],
     }

@@ -173,15 +173,15 @@ def test_message_unreact():
     message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
     message.message_react(user1['token'], message_id['message_id'], 1) #user reacting to his own message
     message.message_react(user2_member['token'], message_id['message_id'], 1) #second user reacting to user1s
-    message.message_unreact(user1['token'], message_id['message_id'], 0)
-    message.message_unreact(user2_member['token'], message_id['message_id'], 0)
+    message.message_unreact(user1['token'], message_id['message_id'], 1)
+    message.message_unreact(user2_member['token'], message_id['message_id'], 1)
 
 def test_message_unreact_invalid_message_id():
     other.clear()
     user1 = auth.auth_register('qwertyuwer@mail.com', '123abcasd', 'Jack', 'Ripper')
     channels.channels_create(user1['token'], 'Test Channel B', True)
     with pytest.raises(InputError):
-        message.message_unreact(user1['token'], 123, 0) #this should raise input error because the message_id doesnt exit i.e. 123
+        message.message_unreact(user1['token'], 123, 1) #this should raise input error because the message_id doesnt exit i.e. 123
 
 
 def test_message_unreact_invalid_react_id():
@@ -200,9 +200,9 @@ def test_message_unreact_already_unreacted():
     test_channel = channels.channels_create(user1['token'], 'Test Channel B', True)
     message_id = message.message_send(user1['token'], test_channel['channel_id'], 'Random Message String asdasdsadas')
     message.message_react(user1['token'], message_id['message_id'], 1)
-    message.message_unreact(user1['token'], message_id['message_id'], 0)
+    message.message_unreact(user1['token'], message_id['message_id'], 1)
     with pytest.raises(InputError):
-        message.message_unreact(user1['token'], message_id['message_id'], 0)
+        message.message_unreact(user1['token'], message_id['message_id'], 1)
 
 #message sendlater is somewhat a wrapper on top of message/send
 #so this means other error checking is not neccessary i.e. valid channel id or valid token
