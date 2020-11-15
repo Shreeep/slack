@@ -130,10 +130,19 @@ def test_delete_message_remove(url):
         'channel_id': payload_channel_one['channel_id'],
         'message': 'Oh no please remove this message'
     }
+
+
+    
     requests.post(url + "/message/send", json=message_one)
     accidental_message = requests.post(url + "/message/send", json=message_two)
     result = accidental_message.json()
-    requests.delete(url + "/message/remove", params={'token': payload_user1['token'], 'message_id': result['message_id']})
+
+    deletion_info = {
+        'token': payload_user1['token'], 
+        'message_id': result['message_id']
+    }
+    deletion = requests.delete(url + "/message/remove", json=deletion_info)
+    assert deletion.status_code == 200
 
 def test_delete_message_remove_no_longer_exists(url):
     #Remove a message
@@ -726,4 +735,205 @@ def test_post_message_sendlater_wrongtime(url):
     })
     assert send_message_later.status_code == 400
 
+def test_message_pin_success(url):
+    user1 = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+    # Register user:
+    register_user1 = requests.post(url + "/auth/register", json=user1)
+    assert register_user1.status_code == 200
 
+    payload_user1 = register_user1.json()
+
+    #Create channel associated with user:
+    test_channel_one_details = {
+        'token': payload_user1['token'],
+        'name': 'Public Channel #1',
+        'is_public': True 
+    }
+    create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
+    assert create_channel_one.status_code == 200
+    
+    payload_channel_one = create_channel_one.json()
+    message_info = {
+        'token': payload_user1['token'],
+        'channel_id': payload_channel_one['channel_id'],
+        'message': 'Test Message Hello Hello',
+    }
+    send_message = requests.post(url + "/message/send", json=message_info)
+    assert send_message.status_code == 200
+    message = send_message.json()
+
+    pinned_message = requests.post(url + "/message/pin", json={
+        'token' : payload_user1['token'],
+        'message_id' : message['message_id'],
+    })
+    #success case
+
+    assert pinned_message.status_code == 200
+
+def test_message_pin_already_pinned(url):
+    user1 = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+    # Register user:
+    register_user1 = requests.post(url + "/auth/register", json=user1)
+    payload_user1 = register_user1.json()
+
+    #Create channel associated with user:
+    test_channel_one_details = {
+        'token': payload_user1['token'],
+        'name': 'Public Channel #1',
+        'is_public': True 
+    }
+    create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
+    payload_channel_one = create_channel_one.json()
+    message_info = {
+        'token': payload_user1['token'],
+        'channel_id': payload_channel_one['channel_id'],
+        'message': 'Test Message Hello Hello'
+    }
+    send_message = requests.post(url + "/message/send", json=message_info)
+    result = send_message.json()
+
+    message_pin_inputs = {
+        'token' : payload_user1['token'],
+        'message_id' : result['message_id']
+    }
+    pinned_message = requests.post(url + "/message/pin", json=message_pin_inputs)
+    pinned_message = requests.post(url + "/message/pin", json=message_pin_inputs)
+
+    #fails because InputError raised when already pinned
+    assert pinned_message.status_code == 400
+
+def test_message_unpin_success(url):
+    user1 = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+    # Register user:
+    register_user1 = requests.post(url + "/auth/register", json=user1)
+    payload_user1 = register_user1.json()
+
+    #Create channel associated with user:
+    test_channel_one_details = {
+        'token': payload_user1['token'],
+        'name': 'Public Channel #1',
+        'is_public': True 
+    }
+    create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
+    payload_channel_one = create_channel_one.json()
+    message_info = {
+        'token': payload_user1['token'],
+        'channel_id': payload_channel_one['channel_id'],
+        'message': 'Test Message Hello Hello'
+    }
+    send_message = requests.post(url + "/message/send", json=message_info)
+    result = send_message.json()
+
+    message_pin_inputs = {
+        'token' : payload_user1['token'],
+        'message_id' : result['message_id']
+    }
+    requests.post(url + "/message/pin", json=message_pin_inputs)
+    unpinned_message = requests.post(url + "/message/unpin", json=message_pin_inputs)
+
+    #fails because InputError raised when already pinned
+    assert unpinned_message.status_code == 200
+
+def test_message_unpin_already_unpinned(url):
+    user1 = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+    # Register user:
+    register_user1 = requests.post(url + "/auth/register", json=user1)
+    payload_user1 = register_user1.json()
+
+    #Create channel associated with user:
+    test_channel_one_details = {
+        'token': payload_user1['token'],
+        'name': 'Public Channel #1',
+        'is_public': True 
+    }
+    create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
+    payload_channel_one = create_channel_one.json()
+    message_info = {
+        'token': payload_user1['token'],
+        'channel_id': payload_channel_one['channel_id'],
+        'message': 'Test Message Hello Hello'
+    }
+    send_message = requests.post(url + "/message/send", json=message_info)
+    result = send_message.json()
+
+    message_pin_inputs = {
+        'token' : payload_user1['token'],
+        'message_id' : result['message_id']
+    }
+    requests.post(url + "/message/pin", json=message_pin_inputs)
+    requests.post(url + "/message/unpin", json=message_pin_inputs)
+    unpinned_message = requests.post(url + "/message/unpin", json=message_pin_inputs)
+
+    #fails because InputError raised when already unpinned
+    assert unpinned_message.status_code == 400
+
+def test_message_unpin_not_member(url):
+    user1 = {
+        'email': 'test@email.com',
+        'password': 'password123',
+        'name_first': 'test',
+        'name_last': 'user'
+    }
+    # Register user:
+    register_user1 = requests.post(url + "/auth/register", json=user1)
+    payload_user1 = register_user1.json()
+
+    user2 = {
+        'email': 'tqwert@email.com',
+        'password': 'passwoqwerrd123',
+        'name_first': 'gladys',
+        'name_last': 'berejik'
+    }
+    register_user2 = requests.post(url + "/auth/register", json=user2)
+    payload_user2 = register_user2.json()
+
+    #Create channel associated with user:
+    test_channel_one_details = {
+        'token': payload_user1['token'],
+        'name': 'Public Channel #1',
+        'is_public': True 
+    }
+    create_channel_one = requests.post(url + "/channels/create", json=test_channel_one_details)
+    payload_channel_one = create_channel_one.json()
+    message_info = {
+        'token': payload_user1['token'],
+        'channel_id': payload_channel_one['channel_id'],
+        'message': 'Test Message Hello Hello'
+    }
+    send_message = requests.post(url + "/message/send", json=message_info)
+    assert send_message.status_code == 200
+    result = send_message.json()
+
+    message_pin_inputs = {
+        'token' : payload_user1['token'],
+        'message_id' : result['message_id']
+    }
+    requests.post(url + "/message/pin", json=message_pin_inputs)
+    unpinned_message = requests.post(url + "/message/unpin", json={
+        'token' : payload_user2['token'],
+        'message_id' : result['message_id']
+    })
+    
+
+    #fails because InputError raised when already unpinned
+    assert unpinned_message.status_code == 400
