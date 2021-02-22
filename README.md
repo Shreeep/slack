@@ -18,12 +18,9 @@ Implemented by Shree Nath, Vignaraj Mahapatra, Hasam Hasam, Wilson Guo
   1. Aims
   2. Overview
   3. Iteration 1: Basic functionality and tests
-  4. Iteration 2: Not yet released
-  5. Iteration 3: Not yet released
+  4. Iteration 2: Implementing Core features 
+  5. Iteration 3: Polishing, bug-fixing and deployment
   6. Interface specifications
-  7. Due Dates and Weightings
-  8. Other Expectations
-  9. Plagiarism
 
 ## 1. Aims:
 
