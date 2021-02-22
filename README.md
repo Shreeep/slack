@@ -1,3 +1,11 @@
+Back-end implementation for a message-board style web-app. Front-end was provided by Michelle Seeto, UNSW.
+
+Users are able to create and customise accounts, send messages, react to each other and moderate their own channels.
+
+Implemented by Shree Nath, Vignaraj Mahapatra, Hasam Hasam, Wilson Guo
+
+
+
 # COMP1531 Major Project
 
 ## Changelog
